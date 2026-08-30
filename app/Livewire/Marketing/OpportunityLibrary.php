@@ -5,6 +5,7 @@ namespace App\Livewire\Marketing;
 use App\Models\GrantOpportunity;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -37,14 +38,16 @@ class OpportunityLibrary extends Component
     public string $sort = 'deadline';
 
     /** @var array<int, string> */
+    #[Locked]
     public array $sectors = [];
 
     /** @var array<int, string> */
+    #[Locked]
     public array $countries = [];
 
     public function mount(): void
     {
-        $filterable = GrantOpportunity::query()->published();
+        $filterable = GrantOpportunity::query()->available();
         $this->sectors = (clone $filterable)->pluck('thematic_sectors')->flatten()->filter()->unique()->sort()->values()->map(static fn (mixed $sector): string => (string) $sector)->all();
         $this->countries = (clone $filterable)->pluck('eligible_countries')->flatten()->filter()->unique()->sort()->values()->map(static fn (mixed $country): string => (string) $country)->all();
 
@@ -65,53 +68,59 @@ class OpportunityLibrary extends Component
     public function selectAllSectors(): void
     {
         $this->selectedSectors = $this->sectors;
+        $this->resetPage();
     }
 
     public function clearSectors(): void
     {
         $this->selectedSectors = [];
+        $this->resetPage();
     }
 
     public function selectAllCountries(): void
     {
         $this->selectedCountries = $this->countries;
+        $this->resetPage();
     }
 
     public function clearCountries(): void
     {
         $this->selectedCountries = [];
+        $this->resetPage();
     }
 
     public function render(): View
     {
-        $query = GrantOpportunity::query()->published()
+        $selectedSectors = array_values(array_intersect(array_filter($this->selectedSectors, 'is_string'), $this->sectors));
+        $selectedCountries = array_values(array_intersect(array_filter($this->selectedCountries, 'is_string'), $this->countries));
+        $query = GrantOpportunity::query()->available()
             ->when($this->status === 'open', fn ($query) => $query->open())
             ->when($this->status === 'closed', fn ($query) => $query->closed())
             ->when($this->status === 'all', fn ($query) => $query->whereNotIn('status', ['draft', 'archived']))
             ->when($this->search !== '', fn ($query) => $query->search($this->search))
             ->when($this->type !== 'all', fn ($query) => $query->where('funding_type', $this->type === 'grant' ? 'Grant' : 'Partnership'))
-            ->when(count($this->selectedSectors) !== count($this->sectors), function ($query): void {
-                if ($this->selectedSectors === []) {
+            ->when(array_diff($this->sectors, $selectedSectors) !== [] || $this->selectedSectors !== $selectedSectors, function ($query) use ($selectedSectors): void {
+                if ($selectedSectors === []) {
                     $query->whereRaw('1 = 0');
 
                     return;
                 }
 
-                $query->where(function ($query): void {
-                    foreach ($this->selectedSectors as $sector) {
+                $query->where(function ($query) use ($selectedSectors): void {
+                    foreach ($selectedSectors as $sector) {
                         $query->orWhereJsonContains('thematic_sectors', $sector);
                     }
                 });
             })
-            ->when(count($this->selectedCountries) !== count($this->countries), function ($query): void {
-                if ($this->selectedCountries === []) {
+            ->when(array_diff($this->countries, $selectedCountries) !== [] || $this->selectedCountries !== $selectedCountries, function ($query) use ($selectedCountries): void {
+                if ($selectedCountries === []) {
                     $query->whereRaw('1 = 0');
 
                     return;
                 }
 
-                $query->where(function ($query): void {
-                    foreach ($this->selectedCountries as $country) {
+                $query->where(function ($query) use ($selectedCountries): void {
+                    foreach ($selectedCountries as $country) {
                         $query->orWhereJsonContains('eligible_countries', $country);
                     }
                 });

@@ -42,11 +42,11 @@ class V1EngagementTest extends TestCase
         $opportunity = GrantOpportunity::query()->create(['title' => 'Public Grant', 'slug' => 'public-grant', 'funder' => 'Funder', 'summary' => 'Summary', 'status' => OpportunityStatus::Active, 'opportunity_url' => 'https://example.org/apply', 'funder_url' => 'https://example.org', 'learn_more_url' => 'https://example.org/info']);
         $this->withSession(['test-session' => true]);
         $this->withCookie(config('session.cookie'), session()->getId());
-        $this->get(route('opportunities.show', $opportunity->slug))->assertOk();
-        $this->get(route('opportunities.show', $opportunity->slug))->assertOk();
+        $this->get(route('opportunities.show', $opportunity))->assertOk();
+        $this->get(route('opportunities.show', $opportunity))->assertOk();
         foreach (['apply' => '/apply', 'funder' => '', 'learn_more' => '/info'] as $kind => $path) {
-            $this->get(route('opportunities.visit', [$opportunity->slug, $kind]))->assertRedirect('https://example.org'.$path);
-            $this->get(route('opportunities.visit', [$opportunity->slug, $kind]))->assertRedirect();
+            $this->get(route('opportunities.visit', [$opportunity, $kind]))->assertRedirect('https://example.org'.$path);
+            $this->get(route('opportunities.visit', [$opportunity, $kind]))->assertRedirect();
         }
         $this->assertDatabaseCount('site_visits', 1);
         $this->assertDatabaseCount('opportunity_events', 4);
@@ -55,7 +55,7 @@ class V1EngagementTest extends TestCase
         $this->assertSame(3, $metrics['Outbound clicks']);
         $this->assertEquals(100, $metrics['Click-through rate']);
         $this->assertNotNull(DB::table('site_visits')->value('visitor_hash'));
-        $this->get(route('opportunities.visit', [$opportunity->slug, 'evil']))->assertNotFound();
+        $this->get(route('opportunities.visit', [$opportunity, 'evil']))->assertNotFound();
     }
 
     public function test_staff_privacy_opt_outs_and_bots_are_not_tracked(): void
@@ -70,8 +70,8 @@ class V1EngagementTest extends TestCase
     public function test_unconfigured_or_unsafe_legacy_links_are_not_redirected(): void
     {
         $opportunity = GrantOpportunity::query()->create(['title' => 'Grant', 'slug' => 'grant', 'funder' => 'Funder', 'summary' => 'Summary', 'status' => OpportunityStatus::Active, 'opportunity_url' => 'javascript:alert(1)']);
-        $this->get(route('opportunities.visit', [$opportunity->slug, 'apply']))->assertNotFound();
-        $this->get(route('opportunities.visit', [$opportunity->slug, 'funder']))->assertNotFound();
+        $this->get(route('opportunities.visit', [$opportunity, 'apply']))->assertNotFound();
+        $this->get(route('opportunities.visit', [$opportunity, 'funder']))->assertNotFound();
         $this->assertDatabaseCount('opportunity_events', 0);
     }
 }

@@ -1,15 +1,15 @@
 <main class="flex-1">
     <section class="border-b border-hair bg-lilac">
-        <div class="mx-auto w-full max-w-[1180px] px-6 py-16 md:px-8 md:py-20">
+        <div class="mx-auto w-full max-w-site px-6 py-16 md:px-8 md:py-20">
             <div class="max-w-3xl"><span class="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-teal">{{ __('Opportunities') }}</span><h1 class="mt-4 text-[38px] font-extrabold leading-[1.04] tracking-[-0.03em] text-charcoal md:text-[52px]">{{ __('Discover funding opportunities that match your work.') }}</h1><p class="mt-5 max-w-[620px] text-[17px] leading-relaxed text-charcoal/70">{{ __('Grantnivo continuously scans hundreds of funders and surfaces grants and partnerships your organisation can pursue. Filter to find exactly what fits.') }}</p></div>
         </div>
     </section>
 
     <section class="bg-white py-12 md:py-16">
-        <div class="mx-auto w-full max-w-[1180px] px-6 md:px-8">
+        <div class="mx-auto w-full max-w-site px-6 md:px-8">
             <div class="relative w-full"><flux:icon.magnifying-glass class="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-purple/70" /><input wire:model.live.debounce.500ms="search" type="search" placeholder="{{ __('Search by title, funder, sector or country…') }}" aria-label="{{ __('Search by title, funder, sector or country…') }}" class="w-full rounded-2xl border-2 border-purple/35 bg-white py-4 pl-12 pr-4 text-[16px] font-semibold text-charcoal placeholder:text-charcoal/65 shadow-sm outline-none transition focus:border-purple focus:bg-white focus:ring-2 focus:ring-purple/15" /></div>
 
-            <div class="mt-4 grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-[1.2fr_1.4fr_1fr_1fr_1.2fr]">
+            <div class="opportunity-filters mt-4 w-full">
                 <div class="flex min-w-0 items-stretch rounded-xl border-2 border-purple/30 bg-white p-1" role="group" aria-label="{{ __('Opportunity status') }}">@foreach (['open' => 'Open', 'closed' => 'Closed', 'all' => 'All'] as $value => $label)<button type="button" aria-pressed="{{ $status === $value ? 'true' : 'false' }}" wire:click="$set('status', '{{ $value }}')" @class(['flex-1 rounded-lg px-3 py-2 text-[14px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple', 'bg-purple text-white' => $status === $value, 'text-charcoal/80 hover:bg-lilac hover:text-purple' => $status !== $value])>{{ __($label) }}</button>@endforeach</div>
                 <div class="flex min-w-0 items-stretch rounded-xl border-2 border-purple/30 bg-white p-1" role="group" aria-label="{{ __('Funding type') }}">@foreach (['all' => 'All', 'grant' => 'Grant', 'partnership' => 'Partnership'] as $value => $label)<button type="button" aria-pressed="{{ $type === $value ? 'true' : 'false' }}" wire:click="$set('type', '{{ $value }}')" @class(['flex-1 rounded-lg px-3 py-2 text-[14px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple', 'bg-purple text-white' => $type === $value, 'text-charcoal/80 hover:bg-lilac hover:text-purple' => $type !== $value])>{{ __($label) }}</button>@endforeach</div>
 

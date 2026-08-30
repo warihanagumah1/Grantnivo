@@ -55,16 +55,16 @@ class V1AdminTest extends TestCase
         $opportunity = GrantOpportunity::query()->sole();
         $this->assertSame(['Ghana', 'Kenya'], $opportunity->eligible_countries);
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'opportunity.created', 'user_id' => $staff->id]);
-        $this->get(route('opportunities.show', $opportunity->slug))->assertOk()->assertSee('Community Fund');
+        $this->get(route('opportunities.show', $opportunity))->assertOk()->assertSee('Community Fund');
         Livewire::test(OpportunityForm::class, ['grantOpportunity' => $opportunity])
             ->set('form.title', 'Updated fund')->call('save')->assertHasNoErrors();
         $this->assertSame('community-fund', $opportunity->fresh()->slug);
         $this->assertSame('Updated fund', $opportunity->fresh()->title);
         Livewire::test(Opportunities::class)->call('archive', $opportunity->id)->assertHasNoErrors();
         $this->assertSoftDeleted($opportunity);
-        $this->get(route('opportunities.show', $opportunity->slug))->assertNotFound();
+        $this->get(route('opportunities.show', $opportunity))->assertNotFound();
         Livewire::test(Opportunities::class)->call('restore', $opportunity->id)->assertHasNoErrors();
-        $this->get(route('opportunities.show', $opportunity->slug))->assertOk();
+        $this->get(route('opportunities.show', $opportunity))->assertOk();
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'opportunity.restored']);
     }
 
@@ -120,8 +120,8 @@ class V1AdminTest extends TestCase
     {
         $opportunity = app(SaveOpportunity::class)->handle(User::factory()->admin()->create(), array_replace($this->fields(), ['status' => 'draft', 'title' => 'Secret draft']));
         $this->get('/opportunities?status=unexpected')->assertOk()->assertDontSee('Secret draft');
-        $this->get(route('opportunities.show', $opportunity->slug))->assertNotFound();
-        $this->get(route('opportunities.visit', [$opportunity->slug, 'apply']))->assertNotFound();
+        $this->get(route('opportunities.show', $opportunity))->assertNotFound();
+        $this->get(route('opportunities.visit', [$opportunity, 'apply']))->assertNotFound();
     }
 
     public function test_closed_and_expired_grants_remain_readable_but_cannot_accept_applications(): void
@@ -129,8 +129,8 @@ class V1AdminTest extends TestCase
         $staff = User::factory()->admin()->create();
         foreach ([['status' => OpportunityStatus::Closed->value], ['deadline' => today()->subDay()->format('Y-m-d')]] as $overrides) {
             $opportunity = app(SaveOpportunity::class)->handle($staff, array_replace($this->fields(), $overrides));
-            $this->get(route('opportunities.show', $opportunity->slug))->assertOk()->assertSee('Applications are closed.')->assertDontSee('Apply on funder site');
-            $this->get(route('opportunities.visit', [$opportunity->slug, 'apply']))->assertStatus(410);
+            $this->get(route('opportunities.show', $opportunity))->assertOk()->assertSee('Applications are closed.')->assertDontSee('Apply on funder site');
+            $this->get(route('opportunities.visit', [$opportunity, 'apply']))->assertStatus(410);
         }
         $this->assertSame(0, GrantOpportunity::query()->open()->count());
         $this->assertSame(2, GrantOpportunity::query()->closed()->count());

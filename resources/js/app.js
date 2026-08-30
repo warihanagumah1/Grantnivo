@@ -1,9 +1,9 @@
 import { validatedForm } from './form-validation';
-import { richTextEditor } from './rich-text-editor';
+import { confirmationDialog } from './confirmation-dialog';
 
 const registerForms = () => {
     window.Alpine.data('validatedForm', validatedForm);
-    window.Alpine.data('richTextEditor', richTextEditor);
+    window.Alpine.data('confirmationDialog', confirmationDialog);
 };
 if (window.Alpine) registerForms();
 else document.addEventListener('alpine:init', registerForms, { once: true });

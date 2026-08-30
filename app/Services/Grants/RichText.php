@@ -2,11 +2,28 @@
 
 namespace App\Services\Grants;
 
+use League\CommonMark\CommonMarkConverter;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 
 class RichText
 {
+    public function fromImport(?string $content): string
+    {
+        // Conversion belongs at the import boundary: never reinterpret literal
+        // Markdown in existing records or HTML produced by the rich-text editor.
+        $converter = new CommonMarkConverter([
+            'html_input' => 'allow',
+            'allow_unsafe_links' => false,
+            'max_nesting_level' => 20,
+            'max_delimiters_per_line' => 1000,
+            'renderer' => ['soft_break' => "<br />\n"],
+        ]);
+
+        // Raw HTML is allowed only into the converter, never past our allowlist.
+        return trim($this->sanitize((string) $converter->convert($content ?? '')));
+    }
+
     public function sanitize(?string $content): string
     {
         $content = trim($content ?? '');

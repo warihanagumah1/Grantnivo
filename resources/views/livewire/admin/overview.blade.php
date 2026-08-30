@@ -1,5 +1,5 @@
 <div>
-    <x-admin.heading eyebrow="Overview" :title="'Welcome back, '.str(auth()->user()->name)->before(' ').'.'"><a href="{{ route('admin.opportunities.create') }}" class="admin-primary"><flux:icon.plus class="size-4" />New opportunity</a></x-admin.heading>
+    <x-admin.heading eyebrow="Overview" :title="'Welcome back, '.str(auth()->user()->name)->before(' ').'.'"><div class="flex flex-wrap gap-3"><a href="{{ route('admin.opportunities.import') }}" class="admin-secondary">Bulk upload CSV</a><a href="{{ route('admin.opportunities.create') }}" class="admin-primary"><flux:icon.plus class="size-4" />New opportunity</a></div></x-admin.heading>
     <x-admin.stats :stats="$stats" />
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <section class="rounded-2xl border border-hair bg-white p-6"><div class="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 class="text-[15px] font-semibold">Recent opportunities</h2><a href="{{ route('admin.opportunities') }}" class="admin-text-link">Manage <flux:icon.arrow-right class="size-3.5" /></a></div>

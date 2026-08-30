@@ -37,11 +37,11 @@ class OpportunityEditorTest extends TestCase
     {
         $staff = User::factory()->admin()->create();
         Livewire::actingAs($staff)->test(OpportunityForm::class)
-            ->set('form.title', 'Private work in progress')->call('saveDraft')
+            ->set('form.title', 'Private work in progress')->set('imageSource', 'upload')->call('saveDraft')
             ->assertHasNoErrors()->assertRedirect(route('admin.opportunities'));
         $grant = GrantOpportunity::query()->sole();
         $this->assertSame(OpportunityStatus::Draft, $grant->status);
-        $this->get(route('opportunities.show', $grant->slug))->assertNotFound();
+        $this->get(route('opportunities.show', $grant))->assertNotFound();
         $this->get('/opportunities')->assertDontSee('Private work in progress');
         $this->get('/admin/opportunities?status=draft')->assertSee('Edit &amp; publish', false);
 
@@ -52,7 +52,7 @@ class OpportunityEditorTest extends TestCase
         $editor->set('form', $this->fields())->call('save')->assertHasNoErrors();
         $this->assertSame(OpportunityStatus::Active, $grant->fresh()->status);
         $this->assertSame('private-work-in-progress', $grant->fresh()->slug);
-        $this->get(route('opportunities.show', $grant->slug))->assertOk()
+        $this->get(route('opportunities.show', $grant))->assertOk()
             ->assertSee('<strong>local projects</strong>', false)
             ->assertSee('<h2>Eligibility</h2>', false)
             ->assertSee('<ul><li>Registered NGOs</li></ul>', false)
@@ -66,7 +66,7 @@ class OpportunityEditorTest extends TestCase
         $grant = app(SaveOpportunity::class)->handle($staff, $this->fields());
         Livewire::test(OpportunityForm::class, ['grantOpportunity' => $grant])->call('saveDraft')->assertHasNoErrors();
         $this->assertSame(OpportunityStatus::Draft, $grant->fresh()->status);
-        $this->get(route('opportunities.show', $grant->slug))->assertNotFound();
+        $this->get(route('opportunities.show', $grant))->assertNotFound();
     }
 
     public function test_unsafe_html_and_attributes_are_removed_before_storage_and_display(): void
@@ -79,7 +79,7 @@ class OpportunityEditorTest extends TestCase
         }
         // Defense in depth: old/imported rows also pass through the sanitizer on output.
         $grant->update(['description' => $unsafe]);
-        $this->get(route('opportunities.show', $grant->slug))->assertOk()
+        $this->get(route('opportunities.show', $grant))->assertOk()
             ->assertSee('<strong>bold</strong>', false)->assertDontSee('onclick="alert(1)"', false)
             ->assertDontSee('javascript:alert(1)', false)->assertDontSee('<iframe', false);
     }
@@ -114,7 +114,7 @@ class OpportunityEditorTest extends TestCase
         $firstPath = $grant->image_path;
         $this->assertNull($grant->image_url);
         Storage::disk('public')->assertExists($firstPath);
-        $this->get(route('opportunities.show', $grant->slug))->assertSee($grant->imageUrl());
+        $this->get(route('opportunities.show', $grant))->assertSee($grant->imageUrl());
 
         Livewire::test(OpportunityForm::class, ['grantOpportunity' => $grant])
             ->assertSet('imageSource', 'upload')->set('form.title', 'Updated title')->call('save')->assertHasNoErrors();

@@ -1,6 +1,6 @@
 <main class="flex-1">
     <section class="bg-purple py-20 md:py-28">
-        <div class="mx-auto grid w-full max-w-[1180px] items-center gap-14 px-6 md:px-8 lg:grid-cols-2">
+        <div class="mx-auto grid w-full max-w-site items-center gap-14 px-6 md:px-8 lg:grid-cols-2">
             <div>
                 <span class="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-teal">{{ __('Join the Waitlist') }}</span>
                 <h1 class="mt-4 text-[34px] font-extrabold leading-[1.06] tracking-[-0.03em] text-white md:text-[46px]">{{ __('Ready to pursue funding smarter?') }}</h1>

@@ -38,6 +38,7 @@
     --color-offwhite: #F8FAFC;
     --color-lilac: #F7F5FB;
     --color-hair: #E7E9EE;
+    --container-site: 87.5rem;
 
     --color-purple-700: #46107D;
     --color-red-600: #C42217;
@@ -135,6 +136,22 @@
 .grant-rich-text li > ul, .grant-rich-text li > ol { margin-top: 0.35em; }
 .grant-rich-text blockquote { border-left: 3px solid var(--color-purple); padding-left: 1em; color: #526374; }
 .grant-rich-text a { color: var(--color-purple); text-decoration: underline; text-underline-offset: 3px; }
+
+.opportunity-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.75rem; align-items: stretch; }
+.opportunity-filters [role='group'] button { white-space: nowrap; }
+@media (min-width: 640px) {
+    .opportunity-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .opportunity-filters > select { grid-column: span 2; }
+}
+@media (min-width: 1024px) {
+    .opportunity-filters { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .opportunity-filters > * { grid-column: span 2; }
+    .opportunity-filters > [role='group'] { grid-column: span 3; }
+}
+@media (min-width: 1440px) {
+    .opportunity-filters { grid-template-columns: minmax(210px, 1.1fr) minmax(270px, 1.4fr) minmax(170px, 1fr) minmax(170px, 1fr) minmax(210px, 1.15fr); }
+    .opportunity-filters > *, .opportunity-filters > select, .opportunity-filters > [role='group'] { grid-column: auto; }
+}
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;

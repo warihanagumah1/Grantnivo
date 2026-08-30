@@ -38,7 +38,7 @@ The six sample opportunities and destination URLs come from Figma; they are **de
 ## V1 workflows
 
 - `/opportunities`: searchable, paginated catalogue with type, status, country, sector, and sort controls.
-- `/opportunities/{slug}`: published grant detail. Draft/archived/deleted grants return 404.
+- `/opportunities/{uuid}`: published grant detail. Draft/archived/deleted grants return 404. Old slug URLs redirect permanently to their UUID URL.
 - Closed and expired grants remain readable; application redirects are disabled. Blank deadlines mean rolling applications.
 - `/waitlist`: validated, rate-limited signup with a bot honeypot. Email addresses are normalized and unique. Repeated submissions do not reveal or overwrite existing details.
 - `/admin`: visitor/session totals, published opportunities, and waitlist totals.
@@ -50,11 +50,21 @@ Grant creation/editing/archiving/restoration and CLI access changes are recorded
 
 ### Opportunity editor
 
-Use **Save as draft** to save an unfinished opportunity (only the title is required). Drafts are private; filter the opportunity list by **Drafts**, choose **Edit & publish**, complete the required fields, then select **Publish opportunity**. Published opportunities use **Save changes** and can be moved back to drafts with confirmation. The public open/closed status remains separate from draft visibility.
+Use **Save as draft** to save an unfinished opportunity (only the title is required). Drafts are private; filter the opportunity list by **Drafts**, choose **Edit & publish**, complete the required fields, then select **Publish opportunity**. Published opportunities use **Save changes** and can be moved back to drafts with confirmation. Delete, Restore, and Move to draft use styled, keyboard-accessible dialogs with Cancel focused initially and duplicate submissions blocked. The public open/closed status remains separate from draft visibility.
 
 Summary and additional details use Tiptap with bold, italic, underline, section headings, bulleted/numbered lists, quotes, and undo/redo. Symfony HtmlSanitizer restricts stored and rendered HTML to supported formatting and safe links. Existing plain-text records remain readable. Limits are 2,000 visible characters for summary and 20,000 for additional details.
 
 Images can use a public HTTPS URL or an uploaded JPG, PNG, or WebP (5 MB maximum, 6,000 pixels per side). Alt text is required when publishing with an image. Uploaded public marketing images use Laravel's `public` disk by default; run `storage:link` and configure `APP_URL` correctly. `OPPORTUNITY_IMAGES_DISK` can select another configured, publicly readable disk such as S3. Storage paths and disk names are server-owned. Replaced uploads are removed only after a successful save; soft-deleted opportunities keep their image for restoration. No private organisation documents are made public.
+
+**Bulk upload CSV** opens `/admin/opportunities/import` with a downloadable template. CSV UTF-8 imports accept up to 250 rows / 2 MB; only `title` is required. Every row is forced to draft, regardless of any `status` column. Any validation error rolls back the entire batch, including audit records, and identifies the CSV record to fix. Imports create new records rather than updating existing grants. Images can be linked in CSV or uploaded later in the individual editor.
+
+The shared public/admin layout has a 1,400px maximum with responsive gutters; filters wrap into roomy rows below wide desktop sizes. Country/sector options come only from published open or closed opportunities, excluding future openings, drafts, archives, and deleted records.
+
+Opportunities use server-generated UUIDv7 identifiers with a unique, non-null database constraint. The migration backfills every existing opportunity, including archived/deleted ones. Public, outbound, and admin edit URLs use UUIDs; old public slugs and staff-only numeric edit links redirect permanently. Internal integer IDs remain unchanged so analytics and audit relationships are preserved. Renaming a grant never changes its UUID.
+
+Bulk upload is available in the admin overview, opportunity list, and new-opportunity form, without a separate sidebar menu item. The CSV template contains all supported fields, a Markdown summary, and a multi-section Markdown description. Summary/description accept Markdown (recommended), supported HTML, or plain text: `## Heading` and `<h2>Heading</h2>` produce the same section heading. Use `###` for subheadings, `**bold**`, `*italic*`, `- item`, `1. item`, `> quote`, and `[label](https://example.org)` for links. Put line breaks and blank lines inside the spreadsheet cell, then export as CSV UTF-8; spreadsheet font styling itself is not preserved. Other fields are plain text. Imports convert Markdown using Laravel's existing CommonMark dependency and sanitize the resulting HTML before saving. Existing HTML/editor content is not reinterpreted as Markdown. Imports remain drafts until reviewed and published.
+
+Grant details use **Learn more** as the primary link, prioritizing `learn_more_url`, then the application link (open grants only), then the funder website. Other populated, distinct URLs appear as secondary links. Blank, unsafe, and duplicate destinations are hidden; missing URLs do not produce a misleading waitlist button. Closed grants never offer an application redirect.
 
 ## Analytics
 

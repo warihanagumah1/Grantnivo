@@ -14,7 +14,8 @@
         <p class="mb-3 px-2 font-mono text-[10px] uppercase tracking-[0.16em] text-charcoal/40">Admin console</p>
         <nav aria-label="Admin navigation" class="grid gap-1">
             @foreach (['admin.overview' => ['Overview', 'squares-2x2'], 'admin.opportunities' => ['Opportunities', 'square-3-stack-3d'], 'admin.analytics' => ['Analytics', 'arrow-trending-up'], 'admin.waitlist' => ['Waitlist', 'bell']] as $route => [$label, $icon])
-                <a href="{{ route($route) }}" @class(['flex items-center gap-3 rounded-xl px-3 py-3 text-[14px] font-medium transition-colors', 'bg-purple text-white' => request()->routeIs($route, $route.'.*'), 'text-charcoal/70 hover:bg-purple-tint hover:text-purple' => !request()->routeIs($route, $route.'.*')]) @if(request()->routeIs($route, $route.'.*')) aria-current="page" @endif><flux:icon :name="$icon" class="size-[18px]" />{{ $label }}</a>
+                @php($active = request()->routeIs($route, $route.'.*'))
+                <a href="{{ route($route) }}" @class(['flex items-center gap-3 rounded-xl px-3 py-3 text-[14px] font-medium transition-colors', 'bg-purple text-white' => $active, 'text-charcoal/70 hover:bg-purple-tint hover:text-purple' => !$active]) @if($active) aria-current="page" @endif><flux:icon :name="$icon" class="size-[18px]" />{{ $label }}</a>
             @endforeach
         </nav>
         <div class="mt-auto pt-10">
@@ -27,7 +28,7 @@
         </div>
     </aside>
     <main id="main-content" class="min-w-0 p-6 md:p-10 lg:ml-[248px]">
-        <div class="mx-auto max-w-[1280px]">
+        <div class="mx-auto max-w-site">
             @if(session('success'))<div role="status" class="mb-6 flex items-start gap-3 rounded-xl border border-teal/20 bg-teal-tint px-4 py-3 text-[14px] text-charcoal"><flux:icon.check-circle class="size-5 shrink-0 text-teal" />{{ session('success') }}</div>@endif
             {{ $slot }}
         </div>

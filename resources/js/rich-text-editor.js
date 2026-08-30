@@ -55,3 +55,7 @@ export function richTextEditor(field, limit) {
         destroy() { editor?.destroy(); },
     };
 }
+
+const registerEditor = () => window.Alpine.data('richTextEditor', richTextEditor);
+if (window.Alpine) registerEditor();
+else document.addEventListener('alpine:init', registerEditor, { once: true });

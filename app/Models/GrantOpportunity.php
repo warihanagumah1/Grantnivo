@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\OpportunityStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -28,7 +29,19 @@ use Illuminate\Support\Facades\Storage;
 ])]
 class GrantOpportunity extends Model
 {
+    use HasUuids;
     use SoftDeletes;
+
+    /** @return list<string> */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 
     public function imageUrl(): ?string
     {
@@ -47,6 +60,18 @@ class GrantOpportunity extends Model
     public function scopePublished(Builder $query): void
     {
         $query->whereIn('status', [OpportunityStatus::Active, OpportunityStatus::ClosingSoon, OpportunityStatus::Closed]);
+    }
+
+    /** Published opportunities that are open or closed, excluding future openings.
+     * @param  Builder<GrantOpportunity>  $query
+     */
+    public function scopeAvailable(Builder $query): void
+    {
+        $query->published()->where(fn (Builder $query) => $query
+            ->where('status', OpportunityStatus::Closed)
+            ->orWhereDate('deadline', '<', today())
+            ->orWhereNull('open_date')
+            ->orWhereDate('open_date', '<=', today()));
     }
 
     /** @param Builder<GrantOpportunity> $query */

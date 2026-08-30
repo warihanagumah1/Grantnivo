@@ -3,6 +3,7 @@
 namespace App\Livewire\Marketing;
 
 use App\Models\GrantOpportunity;
+use App\Services\Grants\OpportunityLinks;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -20,7 +21,7 @@ class OpportunityDetail extends Component
 
     public function render(): View
     {
-        return view('livewire.marketing.opportunity-detail')
+        return view('livewire.marketing.opportunity-detail', ['links' => app(OpportunityLinks::class)->visible($this->grantOpportunity)])
             ->title($this->grantOpportunity->title);
     }
 }

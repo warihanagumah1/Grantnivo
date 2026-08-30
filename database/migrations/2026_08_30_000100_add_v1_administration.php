@@ -52,6 +52,9 @@ return new class extends Migration
         Schema::table('grant_opportunities', function (Blueprint $table) {
             $table->dropColumn(['learn_more_url', 'deleted_at']);
         });
-        Schema::table('users', fn (Blueprint $table) => $table->dropColumn('is_admin'));
+        Schema::table('users', function (Blueprint $table): void {
+            $table->dropIndex(['is_admin']);
+            $table->dropColumn('is_admin');
+        });
     }
 };

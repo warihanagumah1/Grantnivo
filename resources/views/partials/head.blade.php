@@ -11,6 +11,9 @@
 
 
 @vite(['resources/css/app.css', 'resources/js/app.js'])
+@if(request()->routeIs('admin.opportunities.create', 'admin.opportunities.edit'))
+    @vite('resources/js/rich-text-editor.js')
+@endif
 <script>
     window.localStorage.setItem('flux.appearance', 'light');
     document.documentElement.classList.remove('dark');

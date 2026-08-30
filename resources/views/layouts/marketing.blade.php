@@ -7,7 +7,7 @@
     <body class="marketing-v1 min-h-screen">
         <div class="flex min-h-screen flex-col">
         <header class="sticky top-0 z-50 border-b border-hair/70 bg-white/85 backdrop-blur-md" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false; $refs.menuButton.focus()">
-            <div class="mx-auto flex h-[92px] w-full max-w-[1180px] items-center justify-between px-6 md:px-8">
+            <div class="mx-auto flex h-[92px] w-full max-w-site items-center justify-between px-6 md:px-8">
                 <div class="flex items-center gap-10">
                     <x-app-logo href="{{ route('home') }}" class="w-auto! max-w-none!">
                     </x-app-logo>
@@ -38,7 +38,7 @@
         <div class="flex flex-1 flex-col">{{ $slot }}</div>
 
         <footer class="border-t border-hair bg-white py-16">
-            <div class="mx-auto w-full max-w-[1180px] px-6 md:px-8">
+            <div class="mx-auto w-full max-w-site px-6 md:px-8">
                 <div class="grid gap-10 lg:grid-cols-[1.3fr_2fr]">
                     <div>
                         <x-app-logo href="{{ route('home') }}" class="w-auto! max-w-none! [&_img]:h-7 [&_img]:w-auto" />

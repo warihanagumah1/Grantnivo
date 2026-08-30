@@ -7,6 +7,7 @@
     <a href="{{ route('admin.opportunities') }}" class="admin-text-link mb-5"><flux:icon.arrow-left class="size-4" />Opportunities</a>
     <h1 class="text-[28px] font-bold tracking-tight">{{ $opportunityId ? 'Edit opportunity' : 'New opportunity' }}</h1>
     <p class="mt-2 text-[14px] text-charcoal/65">Save your progress privately, or publish when it’s ready. Fields marked * are required to publish.</p>
+    @if(!$opportunityId)<p class="mt-3 text-[13px] text-charcoal/65">Adding several grants? <a href="{{ route('admin.opportunities.import') }}" class="admin-text-link">Bulk upload a CSV</a> or <a href="{{ route('admin.opportunities.import-template') }}" class="admin-text-link">download the template</a>.</p>@endif
     @if($opportunityId && $savedStatus === 'draft')<p class="mt-3 inline-flex rounded-full bg-purple-tint px-3 py-1 text-[12px] font-semibold text-purple">Draft · Not visible on the website</p>@endif
     <x-ui.validated-form wire:submit="save" spacing="mt-8 grid gap-8 xl:grid-cols-[1.5fr_1fr]">
         <div class="grid gap-4">
@@ -42,12 +43,20 @@
             </fieldset>
             <x-admin.rich-text field="summary" label="Summary" :limit="2000" required />
             <x-admin.rich-text field="description" label="Additional details (optional)" :limit="20000" />
-            <x-admin.input label="Funder website" field="funder_url" type="url" placeholder="https://wellspringfoundation.org" maxlength="2048" />
-            <div class="grid gap-4 sm:grid-cols-2"><x-admin.input label="Learn-more link" field="learn_more_url" type="url" placeholder="https://…/programme" maxlength="2048" /><x-admin.input label="Application link" field="opportunity_url" type="url" placeholder="https://…/apply" maxlength="2048" /></div>
+            <fieldset class="grid gap-3 rounded-xl border-2 border-slate-300 p-4">
+                <legend class="px-1 text-[13px] font-semibold">Website links (optional)</legend>
+                <x-admin.input label="Learn more — main button" field="learn_more_url" type="url" placeholder="https://…/programme" maxlength="2048" />
+                <p class="text-[12px] text-charcoal/60">Link to the full grant details. Add the links below only if they lead somewhere different. Empty or duplicate links are hidden.</p>
+                <div class="grid gap-4 sm:grid-cols-2"><x-admin.input label="Application link" field="opportunity_url" type="url" placeholder="https://…/apply" maxlength="2048" /><x-admin.input label="Funder website" field="funder_url" type="url" placeholder="https://wellspringfoundation.org" maxlength="2048" /></div>
+            </fieldset>
             <div class="mt-2 border-t border-hair pt-5">
                 <div class="flex flex-wrap items-center gap-3">
                     <button type="submit" disabled x-bind:disabled="blocked || uploading" x-bind:aria-disabled="(blocked || uploading).toString()" wire:loading.attr="disabled" class="admin-primary"><span wire:loading.remove wire:target="save">{{ $savedStatus === 'draft' ? 'Publish opportunity' : 'Save changes' }}</span><span wire:loading wire:target="save">Saving…</span></button>
-                    <button type="button" wire:click="saveDraft" @if($savedStatus !== 'draft') wire:confirm="Move this opportunity to drafts? It will no longer be visible on the public website." @endif x-bind:disabled="uploading || submitting || !$wire.form.title.trim()" wire:loading.attr="disabled" class="admin-secondary"><span wire:loading.remove wire:target="saveDraft">{{ $savedStatus === 'draft' ? 'Save as draft' : 'Move to draft' }}</span><span wire:loading wire:target="saveDraft">Saving draft…</span></button>
+                    @if($savedStatus === 'draft')
+                        <button type="button" wire:click="saveDraft" x-bind:disabled="uploading || submitting || !$wire.form.title.trim()" wire:loading.attr="disabled" class="admin-secondary"><span wire:loading.remove wire:target="saveDraft">Save as draft</span><span wire:loading wire:target="saveDraft">Saving draft…</span></button>
+                    @else
+                        <x-admin.confirm-action action="saveDraft()" title="Move opportunity to draft?" message="Your changes will be saved as a draft and this opportunity will no longer be visible on the public website. You can publish it again when ready." confirm-label="Move to draft" disabled-when="uploading || submitting || !$wire.form.title.trim()" class="admin-secondary">Move to draft</x-admin.confirm-action>
+                    @endif
                     <a href="{{ route('admin.opportunities') }}" class="admin-text-link px-2">Cancel</a>
                 </div>
                 <p class="mt-3 text-[12px] text-charcoal/55">Only a title is needed to start a draft. Find it in Opportunities → Drafts, then edit and publish when ready.</p>
