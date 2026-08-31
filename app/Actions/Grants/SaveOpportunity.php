@@ -77,7 +77,14 @@ class SaveOpportunity
         $disk = $source === 'upload' ? $oldDisk : null;
         if ($source === 'upload' && $image) {
             $disk = config('filesystems.opportunity_images', 'public');
-            $path = $image->storePublicly('opportunities', $disk);
+            try {
+                $path = $image->store('opportunities', [
+                    'disk' => $disk,
+                    'visibility' => config("filesystems.disks.{$disk}.visibility", 'public'),
+                ]);
+            } catch (Throwable $exception) {
+                throw ValidationException::withMessages(['image' => 'The image could not be saved. Please try again.']);
+            }
             if (! $path) {
                 throw ValidationException::withMessages(['image' => 'The image could not be saved. Please try again.']);
             }
@@ -111,7 +118,11 @@ class SaveOpportunity
             });
         } catch (Throwable $exception) {
             if ($path && $path !== $oldPath) {
-                Storage::disk($disk)->delete($path);
+                try {
+                    Storage::disk($disk)->delete($path);
+                } catch (Throwable $cleanupException) {
+                    report($cleanupException);
+                }
             }
             throw $exception;
         }

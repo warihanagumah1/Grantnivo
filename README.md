@@ -116,3 +116,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for production requirements, the clean releas
 Privacy, Terms & Waitlist Conditions, and Cookie Policy & Preferences are linked in the public footer. Policy links also appear beside the required waitlist checkbox. Invalid form buttons fade and stay disabled until frontend validation passes; backend validation remains authoritative.
 
 The `LEGAL_*` and `PRIVACY_CONTACT_EMAIL` defaults and environment examples contain the confirmed WAMEER operator details, Ghana registration, postal address and support email. Legal review remains a separate launch requirement; confirming contact details does not set the review flag. See [POLICY_REVIEW.md](POLICY_REVIEW.md) for the launch checklist and consent version history. Cookie choices never determine eligibility for the waitlist.
+
+## Cloudflare R2
+
+Production opportunity media uses a dedicated `r2` disk through Laravel’s S3 adapter. Both file uploads and downloaded URL images use it when `OPPORTUNITY_IMAGES_DISK=r2`. Existing local images keep their stored disk until explicitly migrated. Private files and temporary uploads remain separate. Configure the bucket credentials and public image domain using [R2_SETUP.md](R2_SETUP.md); never commit credentials. Deploy from GitHub using [DEPLOYMENT.md](DEPLOYMENT.md), without a release ZIP.

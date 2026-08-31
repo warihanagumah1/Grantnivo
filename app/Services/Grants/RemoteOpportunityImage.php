@@ -69,7 +69,10 @@ class RemoteOpportunityImage
                 file_put_contents($temporary, $contents);
                 $image = new UploadedFile($temporary, 'image.'.$extension, test: true);
                 Validator::make(['image_url' => $image], ['image_url' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120', 'dimensions:max_width=6000,max_height=6000']])->validate();
-                $path = $image->storePublicly('opportunities', $disk);
+                $path = $image->store('opportunities', [
+                    'disk' => $disk,
+                    'visibility' => config("filesystems.disks.{$disk}.visibility", 'public'),
+                ]);
                 if (! $path) {
                     throw new RuntimeException('Image storage failed.');
                 }

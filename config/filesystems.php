@@ -62,6 +62,23 @@ return [
             'report' => false,
         ],
 
+        // Public opportunity media only. Access is controlled by the R2 bucket/domain,
+        // not S3 object ACLs. Keep private documents and temporary uploads separate.
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_PUBLIC_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'private',
+            'http' => ['connect_timeout' => 5, 'timeout' => 30],
+            'throw' => true,
+            'report' => false,
+        ],
+
     ],
 
     /*

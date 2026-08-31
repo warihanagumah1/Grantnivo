@@ -1,6 +1,6 @@
 # Deploy Grantnivo V1
 
-The release ZIP contains application source and compiled assets. It intentionally excludes `.env`, PHP/Node dependencies, uploads, databases, logs, runtime caches, tests, and the retired build specifications. It is not a backup of your data.
+Deploy from GitHub into a new release directory, using a reviewed commit. Keep production secrets in the host environment and user data in persistent storage; neither belongs in the repository. No deployment ZIP is required.
 
 ## Requirements
 
@@ -8,13 +8,13 @@ The release ZIP contains application source and compiled assets. It intentionall
 - Composer 2 and a supported MySQL database. Use a dedicated application database user.
 - HTTPS and a web server with its document root set to `public/`, never the project root.
 - Writable `storage/` and `bootstrap/cache/`, with permissions limited to the deployment and web-server users. Do not use `chmod 777`.
-- Persistent `storage/app/public` for images. Back it up together with the database and the existing application key.
+- Cloudflare R2 for new opportunity images; follow [R2_SETUP.md](R2_SETUP.md). Preserve local public storage for any images whose database records still use the `public` disk. Back up media, the database and the existing application key.
 - Outbound DNS and HTTPS access for downloading images and checking production passwords. Private-network image URLs are deliberately rejected.
 - PHP `upload_max_filesize` of at least `5M`, `post_max_size` greater than that (for example `8M`), and matching web-server request limits. Large CSV imports may need longer request timeouts: up to 250 records can each download an image.
 
-Node is only needed if rebuilding assets: use Node 22.13+ and pnpm 11.19.0. The ZIP already includes `public/build`.
+Build assets in the hosting build step or CI using Node 22.13+ and pnpm 11.19.0. Deploy the generated `public/build` directory with the PHP source; a Git checkout alone does not include compiled assets.
 
-## Prepare the release locally
+## Check the release before deploying
 
 ```bash
 composer install --prefer-dist --no-interaction
@@ -22,10 +22,9 @@ pnpm install --frozen-lockfile
 composer test
 pnpm run test:frontend
 pnpm run build
-python3 scripts/build-release.py
 ```
 
-The result is `dist/grantnivo-release.zip`. Extract it into a new release directory on the server. Do not overlay it on a running release or replace persistent storage with the empty directory skeletons.
+Have your hosting provider check out the chosen GitHub commit into a new release directory. Build with `pnpm install --frozen-lockfile` and `pnpm run build`, or supply assets built in CI. Do not overlay a running release or overwrite persistent storage.
 
 ## Configure the server
 
@@ -69,7 +68,7 @@ Behind a load balancer or reverse proxy, configure Laravel to trust only that in
 - Guests cannot access admin or draft preview URLs; a draft's public URL returns 404.
 - A waitlist signup is saved once; repeating the email shows the inline duplicate message.
 - Password reset mail reaches a designated test staff account. `MAIL_MAILER=log` does not send email.
-- `/storage/opportunities/...` images remain available across releases, and private storage is not publicly accessible.
+- New images load from the R2 custom domain across releases. Existing local `/storage/opportunities/...` images remain available if retained. Private storage is not publicly accessible.
 - Review opportunity content, deadlines, outbound links, image rights and the privacy notice before launch.
 
 If activation fails, keep traffic on the previous release. Restore a database backup only through a planned recovery procedure; switching code back does not reverse migrations. Retain the original application key and compatible source for encrypted archive recovery.
