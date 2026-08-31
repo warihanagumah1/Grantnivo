@@ -12,11 +12,19 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Tests\Concerns\FakesOpportunityImages;
 use Tests\TestCase;
 
 class V1AdminTest extends TestCase
 {
+    use FakesOpportunityImages;
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakeOpportunityImages();
+    }
 
     /** @return array<string, mixed> */
     private function fields(): array

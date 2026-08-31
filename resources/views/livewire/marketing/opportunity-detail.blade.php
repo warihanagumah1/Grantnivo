@@ -1,9 +1,15 @@
 <main class="flex-1">
+    @if($preview ?? false)
+        <div class="border-b border-purple/20 bg-purple-tint px-6 py-4 text-center text-[14px] text-purple">
+            <strong>Admin preview.</strong> {{ $grantOpportunity->isPublic() ? 'You are previewing this opportunity.' : 'This opportunity is not published and is only visible to admins.' }}
+            <a href="{{ route('admin.opportunities.edit', $grantOpportunity) }}" class="ml-2 font-semibold underline">Edit opportunity</a>
+        </div>
+    @endif
     <section class="relative min-h-[340px] overflow-hidden bg-charcoal md:min-h-[420px]">
         @if ($grantOpportunity->imageUrl())<img src="{{ $grantOpportunity->imageUrl() }}" alt="{{ $grantOpportunity->image_alt ?: $grantOpportunity->title }}" class="absolute inset-0 h-full w-full object-cover" />@endif
         <div class="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/55 to-charcoal/25"></div>
         <div class="relative mx-auto flex min-h-[340px] w-full max-w-site flex-col justify-end px-6 py-10 md:min-h-[420px] md:px-8">
-            <a href="{{ route('opportunities.index') }}" class="mb-4 flex w-fit items-center gap-1.5 text-[13px] font-medium text-white/80 hover:text-white"><flux:icon.arrow-left class="size-4" />{{ __('All opportunities') }}</a>
+            <a href="{{ route(($preview ?? false) ? 'admin.opportunities' : 'opportunities.index') }}" class="mb-4 flex w-fit items-center gap-1.5 text-[13px] font-medium text-white/80 hover:text-white"><flux:icon.arrow-left class="size-4" />{{ __('All opportunities') }}</a>
             <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->thematic_sectors[0] ?? __('General') }}</span><span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->funding_type ?: __('Grant') }}</span><span class="rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-white backdrop-blur">{{ $grantOpportunity->isOpen() ? __('Open for applications') : $grantOpportunity->publicStatusLabel() }}</span></div>
             <h1 class="mt-4 max-w-3xl text-[32px] font-extrabold leading-tight tracking-[-0.02em] text-white md:text-[44px]">{{ $grantOpportunity->title }}</h1>
             <p class="mt-2 font-mono text-[13px] uppercase tracking-wide text-white/70">{{ $grantOpportunity->funder }}</p>
@@ -32,7 +38,7 @@
                         <div><dt class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide text-charcoal/45"><flux:icon.calendar-days class="size-3.5" />{{ __('Deadline') }}</dt><dd class="mt-0.5 font-mono font-semibold text-red">{{ $grantOpportunity->deadline?->format('d M Y') ?? __('Rolling') }}</dd></div>
                         <div><dt class="font-mono text-[11px] uppercase tracking-wide text-charcoal/45">{{ __('Type') }}</dt><dd class="mt-0.5 font-medium text-charcoal">{{ $grantOpportunity->funding_type ?: __('Grant') }}</dd></div>
                     </dl>
-                    @if(! $grantOpportunity->isOpen())<p class="mt-6 rounded-xl bg-hair p-4 text-center text-[14px] font-medium">{{ $grantOpportunity->publicStatusLabel() === 'Opening soon' ? 'Applications have not opened yet.' : 'Applications are closed.' }}</p>@endif
+                    @if(! ($preview ?? false) && ! $grantOpportunity->isOpen())<p class="mt-6 rounded-xl bg-hair p-4 text-center text-[14px] font-medium">{{ $grantOpportunity->publicStatusLabel() === 'Opening soon' ? 'Applications have not opened yet.' : 'Applications are closed.' }}</p>@endif
                     @foreach($links as $link)
                         <a href="{{ route('opportunities.visit', [$grantOpportunity, $link['kind']]) }}" target="_blank" rel="noreferrer noopener" @class([
                             'mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-red px-6 py-3 text-[15px] font-bold text-white transition-colors hover:bg-[#b31f15]' => $loop->first,

@@ -8,8 +8,10 @@ use App\Services\Grants\RichText;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class ImportOpportunities
 {
@@ -66,31 +68,47 @@ class ImportOpportunities
         }
 
         // The entire batch rolls back if any row fails; successful rows are never left half-imported.
-        return DB::transaction(function () use ($user, $rows): int {
-            $errors = [];
-            foreach ($rows as $number => $row) {
-                $row['status'] = 'draft';
-                $row['funding_type'] = trim($row['funding_type'] ?? '') ?: 'Grant';
-                $row['currency'] = trim($row['currency'] ?? '') ?: 'USD';
-                $row['image_source'] = 'url';
-                try {
-                    Validator::make($row, [
-                        'summary' => ['nullable', 'string', 'max:12000'],
-                        'description' => ['nullable', 'string', 'max:60000'],
-                    ])->validate();
-                    foreach (['summary', 'description'] as $field) {
-                        $row[$field] = $this->richText->fromImport($row[$field] ?? '');
+        $storedImages = [];
+        try {
+            return DB::transaction(function () use ($user, $rows, &$storedImages): int {
+                $errors = [];
+                foreach ($rows as $number => $row) {
+                    $row['status'] = 'draft';
+                    $row['funding_type'] = trim($row['funding_type'] ?? '') ?: 'Grant';
+                    $row['currency'] = trim($row['currency'] ?? '') ?: 'USD';
+                    $row['image_source'] = 'url';
+                    try {
+                        Validator::make($row, [
+                            'summary' => ['nullable', 'string', 'max:12000'],
+                            'description' => ['nullable', 'string', 'max:60000'],
+                        ])->validate();
+                        foreach (['summary', 'description'] as $field) {
+                            $row[$field] = $this->richText->fromImport($row[$field] ?? '');
+                        }
+                        $saved = $this->save->handle($user, $row);
+                        if ($saved->image_path) {
+                            $storedImages[] = [$saved->image_disk, $saved->image_path];
+                        }
+                    } catch (ValidationException $exception) {
+                        $errors['rows.'.$number] = 'Row '.$number.': '.implode(' ', $exception->validator->errors()->all());
                     }
-                    $this->save->handle($user, $row);
-                } catch (ValidationException $exception) {
-                    $errors['rows.'.$number] = 'Row '.$number.': '.implode(' ', $exception->validator->errors()->all());
+                }
+                if ($errors !== []) {
+                    throw ValidationException::withMessages($errors);
+                }
+
+                return count($rows);
+            });
+        } catch (Throwable $exception) {
+            // Database rollback cannot remove files from the storage disk.
+            foreach ($storedImages as [$disk, $path]) {
+                try {
+                    Storage::disk($disk)->delete($path);
+                } catch (Throwable $cleanupException) {
+                    report($cleanupException);
                 }
             }
-            if ($errors !== []) {
-                throw ValidationException::withMessages($errors);
-            }
-
-            return count($rows);
-        });
+            throw $exception;
+        }
     }
 }

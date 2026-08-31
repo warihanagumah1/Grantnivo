@@ -19,9 +19,20 @@ class V1EngagementTest extends TestCase
     public function test_waitlist_normalizes_email_deduplicates_and_preserves_original_details(): void
     {
         Livewire::test(Waitlist::class)->set('name', 'First Person')->set('email', 'TEAM@EXAMPLE.ORG')->set('organisation', 'First Organisation')->call('join')->assertHasNoErrors()->assertSet('submitted', true);
-        Livewire::test(Waitlist::class)->set('name', 'Other Person')->set('email', 'team@example.org')->set('organisation', 'Other Organisation')->call('join')->assertHasNoErrors();
+        foreach (['team@example.org', '  TEAM@Example.ORG  '] as $email) {
+            Livewire::test(Waitlist::class)
+                ->set('name', 'Other Person')
+                ->set('email', $email)
+                ->set('organisation', 'Other Organisation')
+                ->call('join')
+                ->assertHasErrors('email')
+                ->assertSee('This email is already on the waitlist.')
+                ->assertSet('submitted', false)
+                ->assertSet('name', 'Other Person')
+                ->assertSet('organisation', 'Other Organisation');
+        }
         $this->assertDatabaseCount('waitlist_entries', 1);
-        $this->assertDatabaseHas('waitlist_entries', ['email' => 'team@example.org', 'name' => 'First Person']);
+        $this->assertDatabaseHas('waitlist_entries', ['email' => 'team@example.org', 'name' => 'First Person', 'organisation' => 'First Organisation']);
         $this->actingAs(User::factory()->admin()->create())->get(route('admin.waitlist'))->assertOk()->assertSee('First Organisation');
     }
 

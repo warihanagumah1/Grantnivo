@@ -6,6 +6,7 @@ use App\Enums\OpportunityStatus;
 use App\Models\GrantOpportunity;
 use App\Models\User;
 use App\Services\Admin\AuditLog;
+use App\Services\Grants\RemoteOpportunityImage;
 use App\Services\Grants\RichText;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ use Throwable;
 
 class SaveOpportunity
 {
-    public function __construct(private AuditLog $audit, private RichText $richText) {}
+    public function __construct(private AuditLog $audit, private RichText $richText, private RemoteOpportunityImage $remoteImage) {}
 
     /** @param array<string, mixed> $input */
     public function handle(User $user, array $input, ?GrantOpportunity $opportunity = null, ?UploadedFile $image = null): GrantOpportunity
@@ -80,6 +81,11 @@ class SaveOpportunity
             if (! $path) {
                 throw ValidationException::withMessages(['image' => 'The image could not be saved. Please try again.']);
             }
+        }
+        if ($source === 'url' && ! empty($data['image_url'])) {
+            $disk = config('filesystems.opportunity_images', 'public');
+            $path = $this->remoteImage->store($data['image_url'], $disk);
+            $data['image_url'] = null;
         }
 
         try {

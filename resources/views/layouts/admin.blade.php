@@ -29,7 +29,6 @@
     </aside>
     <main id="main-content" class="min-w-0 p-6 md:p-10 lg:ml-[248px]">
         <div class="mx-auto max-w-site">
-            @if(session('success'))<div role="status" class="mb-6 flex items-start gap-3 rounded-xl border border-teal/20 bg-teal-tint px-4 py-3 text-[14px] text-charcoal"><flux:icon.check-circle class="size-5 shrink-0 text-teal" />{{ session('success') }}</div>@endif
             {{ $slot }}
         </div>
     </main>

@@ -1,4 +1,5 @@
 <div class="max-w-4xl">
+    <x-admin.success-notice />
     <a href="{{ route('admin.opportunities') }}" class="admin-text-link mb-5"><flux:icon.arrow-left class="size-4" />Opportunities</a>
     <x-admin.heading eyebrow="Bulk import" title="Add opportunities from a CSV" description="Every imported opportunity is saved privately as a draft. Nothing is published automatically." />
     <div class="my-6 rounded-2xl border border-hair bg-white p-6">
@@ -50,7 +51,7 @@ For **nonprofits** with *local experience*.
         </div>
         <div class="mt-5 flex flex-wrap items-center gap-4">
             <button type="submit" x-bind:disabled="uploading || !$wire.file" wire:loading.attr="disabled" class="admin-primary"><span wire:loading.remove wire:target="import">Import as drafts</span><span wire:loading wire:target="import">Validating and importing…</span></button>
-            <a href="{{ route('admin.opportunities') }}" class="admin-text-link">Cancel</a>
+            <a href="{{ route('admin.opportunities') }}" class="admin-secondary">Cancel</a>
         </div>
         <p class="mt-3 text-[12px] text-charcoal/55">The whole file must pass validation. If any row fails, no opportunities are imported.</p>
     </form>

@@ -31,6 +31,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(fun
     Route::get('opportunities/create', Admin\OpportunityForm::class)->name('opportunities.create');
     Route::get('opportunities/import', Admin\OpportunityImport::class)->name('opportunities.import');
     Route::get('opportunities/import-template', fn () => response()->download(resource_path('examples/opportunities.csv'), 'grantnivo-opportunities-template.csv', ['Content-Type' => 'text/csv; charset=UTF-8']))->name('opportunities.import-template');
+    Route::get('opportunities/{grantOpportunity:uuid}/preview', Admin\OpportunityPreview::class)->whereUuid('grantOpportunity')->name('opportunities.preview');
     Route::get('opportunities/{grantOpportunity:uuid}/edit', Admin\OpportunityForm::class)->whereUuid('grantOpportunity')->name('opportunities.edit');
     Route::get('opportunities/{legacyOpportunity:id}/edit', [LegacyOpportunityRedirectController::class, 'edit'])->whereNumber('legacyOpportunity')->name('opportunities.legacy-edit');
     Route::get('analytics', Admin\Analytics::class)->name('analytics');

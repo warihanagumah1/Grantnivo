@@ -15,11 +15,19 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use RuntimeException;
+use Tests\Concerns\FakesOpportunityImages;
 use Tests\TestCase;
 
 class OpportunityEditorTest extends TestCase
 {
+    use FakesOpportunityImages;
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->fakeOpportunityImages();
+    }
 
     private function fields(array $overrides = []): array
     {
@@ -128,8 +136,10 @@ class OpportunityEditorTest extends TestCase
 
         Livewire::test(OpportunityForm::class, ['grantOpportunity' => $grant->fresh()])
             ->set('imageSource', 'url')->set('form.image_url', 'https://example.org/photo.jpg')->call('save')->assertHasNoErrors();
-        $this->assertNull($grant->fresh()->image_path);
-        $this->assertSame('https://example.org/photo.jpg', $grant->fresh()->imageUrl());
+        $this->assertNotNull($grant->fresh()->image_path);
+        $this->assertNull($grant->fresh()->image_url);
+        $this->assertStringContainsString('/storage/opportunities/', $grant->fresh()->imageUrl());
+        Storage::disk('public')->assertExists($grant->fresh()->image_path);
         Storage::disk('public')->assertMissing($secondPath);
     }
 

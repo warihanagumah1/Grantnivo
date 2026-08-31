@@ -4,6 +4,7 @@
     x-on:livewire-upload-error="uploading = false; uploadFailed = true"
     x-on:livewire-upload-cancel="uploading = false"
     x-on:submit.capture="if (uploading) { $event.preventDefault(); $event.stopImmediatePropagation() }">
+    <x-admin.success-notice />
     <a href="{{ route('admin.opportunities') }}" class="admin-text-link mb-5"><flux:icon.arrow-left class="size-4" />Opportunities</a>
     <h1 class="text-[28px] font-bold tracking-tight">{{ $opportunityId ? 'Edit opportunity' : 'New opportunity' }}</h1>
     <p class="mt-2 text-[14px] text-charcoal/65">Save your progress privately, or publish when it’s ready. Fields marked * are required to publish.</p>
@@ -28,6 +29,7 @@
                 </div>
                 <div x-show="$wire.imageSource === 'url'">
                     <x-admin.input label="Image URL" field="image_url" type="url" data-protocols="https:" x-bind:disabled="$wire.imageSource !== 'url'" placeholder="https://images.unsplash.com/photo-…" maxlength="2048" />
+                    <p class="text-[12px] text-charcoal/60">We download and store the image when you save. JPG, PNG or WebP, up to 5 MB and 6000 × 6000 pixels.</p>
                     <p class="mt-1 text-[11px] text-charcoal/55">Use a public HTTPS image link, or leave blank for no image.</p>
                 </div>
                 <div x-show="$wire.imageSource === 'upload'" x-cloak class="grid gap-2">
@@ -57,7 +59,7 @@
                     @else
                         <x-admin.confirm-action action="saveDraft()" title="Move opportunity to draft?" message="Your changes will be saved as a draft and this opportunity will no longer be visible on the public website. You can publish it again when ready." confirm-label="Move to draft" disabled-when="uploading || submitting || !$wire.form.title.trim()" class="admin-secondary">Move to draft</x-admin.confirm-action>
                     @endif
-                    <a href="{{ route('admin.opportunities') }}" class="admin-text-link px-2">Cancel</a>
+                    <a href="{{ route('admin.opportunities') }}" class="admin-secondary">Cancel</a>
                 </div>
                 <p class="mt-3 text-[12px] text-charcoal/55">Only a title is needed to start a draft. Find it in Opportunities → Drafts, then edit and publish when ready.</p>
             </div>

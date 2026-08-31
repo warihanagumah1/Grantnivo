@@ -1,4 +1,5 @@
 <div>
+    <x-admin.success-notice />
     <x-admin.heading eyebrow="Waitlist" title="Waitlist signups" :description="$total.' organisations have requested early access.'" />
     @if($total > 0)<label class="mb-5 block"><span class="sr-only">Search waitlist</span><input wire:model.live.debounce.300ms="search" type="search" maxlength="200" placeholder="Search name, email, or organisation…" class="admin-input max-w-lg" /></label>@endif
     <div class="overflow-x-auto rounded-2xl border border-hair bg-white">
