@@ -19,10 +19,11 @@ class JoinWaitlist
         RateLimiter::hit($key, 60);
         $input['email'] = mb_strtolower(trim((string) ($input['email'] ?? '')));
         $validated = Validator::make($input, [
+            'acceptPolicies' => ['accepted'],
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email:rfc', 'max:255'],
             'organisation' => ['required', 'string', 'max:180'],
-        ])->validate();
+        ], ['acceptPolicies.accepted' => 'Please agree to the Terms and acknowledge the Privacy Policy to join the waitlist.'])->validate();
 
         // The unique email index also protects against simultaneous signups.
         $entry = WaitlistEntry::query()->firstOrCreate(['email' => $validated['email']], [
@@ -30,6 +31,10 @@ class JoinWaitlist
             'organisation' => trim($validated['organisation']),
             'source' => 'waitlist',
             'subscribed_at' => now(),
+            'consented_at' => now(),
+            'privacy_policy_version' => config('legal.privacy_version'),
+            'terms_version' => config('legal.terms_version'),
+            'consent_version' => config('legal.consent_version'),
         ]);
 
         if (! $entry->wasRecentlyCreated) {

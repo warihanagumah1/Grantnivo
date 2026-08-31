@@ -2,6 +2,7 @@
 export function fieldMessage(field, fields) {
     const value = field.value ?? '';
     const find = (key) => fields.find((item) => item.name === key || item.id === key || Array.from(item.attributes || []).some((attribute) => attribute.name.startsWith('wire:model') && attribute.value === key));
+    if (field.required && field.type === 'checkbox' && !field.checked) return 'Please tick this checkbox to continue.';
     if (field.required && !['checkbox', 'radio', 'file'].includes(field.type) && !value.trim()) {
         return 'Please complete this field.';
     }

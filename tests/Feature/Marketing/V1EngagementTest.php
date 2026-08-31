@@ -18,12 +18,12 @@ class V1EngagementTest extends TestCase
 
     public function test_waitlist_normalizes_email_deduplicates_and_preserves_original_details(): void
     {
-        Livewire::test(Waitlist::class)->set('name', 'First Person')->set('email', 'TEAM@EXAMPLE.ORG')->set('organisation', 'First Organisation')->call('join')->assertHasNoErrors()->assertSet('submitted', true);
+        Livewire::test(Waitlist::class)->set('name', 'First Person')->set('email', 'TEAM@EXAMPLE.ORG')->set('organisation', 'First Organisation')->set('acceptPolicies', true)->call('join')->assertHasNoErrors()->assertSet('submitted', true);
         foreach (['team@example.org', '  TEAM@Example.ORG  '] as $email) {
             Livewire::test(Waitlist::class)
                 ->set('name', 'Other Person')
                 ->set('email', $email)
-                ->set('organisation', 'Other Organisation')
+                ->set('organisation', 'Other Organisation')->set('acceptPolicies', true)
                 ->call('join')
                 ->assertHasErrors('email')
                 ->assertSee('This email is already on the waitlist.')
@@ -42,9 +42,9 @@ class V1EngagementTest extends TestCase
         Livewire::test(Waitlist::class)->set('website', 'spam')->call('join')->assertSet('submitted', true);
         $this->assertDatabaseCount('waitlist_entries', 0);
         for ($i = 0; $i < 5; $i++) {
-            Livewire::test(Waitlist::class)->set('name', 'Test')->set('email', 'team@example.org')->set('organisation', 'Community')->call('join');
+            Livewire::test(Waitlist::class)->set('name', 'Test')->set('email', 'team@example.org')->set('organisation', 'Community')->set('acceptPolicies', true)->call('join');
         }
-        Livewire::test(Waitlist::class)->set('name', 'Test')->set('email', 'another@example.org')->set('organisation', 'Community')->call('join')->assertHasErrors('email');
+        Livewire::test(Waitlist::class)->set('name', 'Test')->set('email', 'another@example.org')->set('organisation', 'Community')->set('acceptPolicies', true)->call('join')->assertHasErrors('email');
         $this->assertDatabaseCount('waitlist_entries', 1);
     }
 
@@ -53,6 +53,7 @@ class V1EngagementTest extends TestCase
         $opportunity = GrantOpportunity::query()->create(['title' => 'Public Grant', 'slug' => 'public-grant', 'funder' => 'Funder', 'summary' => 'Summary', 'status' => OpportunityStatus::Active, 'opportunity_url' => 'https://example.org/apply', 'funder_url' => 'https://example.org', 'learn_more_url' => 'https://example.org/info']);
         $this->withSession(['test-session' => true]);
         $this->withCookie(config('session.cookie'), session()->getId());
+        $this->withCookie('grantnivo_analytics', 'accepted');
         $this->get(route('opportunities.show', $opportunity))->assertOk();
         $this->get(route('opportunities.show', $opportunity))->assertOk();
         foreach (['apply' => '/apply', 'funder' => '', 'learn_more' => '/info'] as $kind => $path) {
@@ -71,7 +72,7 @@ class V1EngagementTest extends TestCase
 
     public function test_staff_privacy_opt_outs_and_bots_are_not_tracked(): void
     {
-        $this->withHeaders(['DNT' => '1'])->get('/')->assertOk();
+        $this->withCookie('grantnivo_analytics', 'accepted')->withHeaders(['DNT' => '1'])->get('/')->assertOk();
         $this->flushHeaders()->withHeaders(['Sec-GPC' => '1'])->get('/')->assertOk();
         $this->flushHeaders()->withHeaders(['User-Agent' => 'Googlebot'])->get('/')->assertOk();
         $this->flushHeaders()->actingAs(User::factory()->admin()->create())->get('/')->assertOk();

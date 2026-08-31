@@ -22,3 +22,10 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Local metadata and release artifacts
+.DS_Store
+/dist/
+.env.*
+!.env.example
+!.env.production.example

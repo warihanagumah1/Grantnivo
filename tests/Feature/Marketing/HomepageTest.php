@@ -41,6 +41,7 @@ class HomepageTest extends TestCase
             ->set('name', 'Amara Okafor')
             ->set('email', 'amara@example.org')
             ->set('organisation', 'Community Action Network')
+            ->set('acceptPolicies', true)
             ->call('join')
             ->assertHasNoErrors()
             ->assertSet('submitted', true);

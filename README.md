@@ -6,7 +6,7 @@ The older Organisation Brain, customer dashboard, proposals, applications, regis
 
 ## Stack
 
-PHP 8.3+, Laravel 13, Livewire 4, Flux, Tailwind 4, Vite, and Laravel Fortify. This local installation uses the existing MySQL database `grantnivo`; tests use isolated SQLite. No AI API, document parser, vector store, or additional database is required for V1. PostgreSQL migration should be a separate, backed-up deployment change, not a side effect of UI cleanup.
+PHP 8.4.1+, Laravel 13, Livewire 4, Flux, Tailwind 4, Vite, and Laravel Fortify. This local installation uses the existing MySQL database `grantnivo`; tests use isolated SQLite. No AI API, document parser, vector store, or additional database is required for V1. PostgreSQL migration should be a separate, backed-up deployment change, not a side effect of UI cleanup.
 
 ## Setup
 
@@ -17,8 +17,8 @@ php artisan key:generate
 # Configure your database in .env before continuing.
 php artisan migrate
 php artisan storage:link
-npm install
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 php artisan v1:admin your-email@example.com
 php artisan serve
 ```
@@ -40,7 +40,7 @@ The six sample opportunities and destination URLs come from Figma; they are **de
 - `/opportunities`: searchable, paginated catalogue with type, status, country, sector, and sort controls.
 - `/opportunities/{uuid}`: published grant detail. Draft/archived/deleted grants return 404. Old slug URLs redirect permanently to their UUID URL.
 - Closed and expired grants remain readable; application redirects are disabled. Blank deadlines mean rolling applications.
-- `/waitlist`: validated, rate-limited signup with a bot honeypot. Email addresses are normalized and unique. Repeated submissions do not reveal or overwrite existing details.
+- `/waitlist`: validated, rate-limited signup with a bot honeypot and a required, initially unchecked policy acknowledgement / waitlist email request. Acceptance time and policy/statement versions are stored server-side; older entries retain their original consent evidence. Email addresses are normalized and unique. Repeated submissions show an inline duplicate-email message without overwriting existing details.
 - `/admin`: visitor/session totals, published opportunities, and waitlist totals.
 - `/admin/opportunities`: create, edit, search, filter, publish/draft, and archive/restore. Slugs remain stable on edit. Deletion is recoverable.
 - `/admin/analytics`: opportunity views, funder/learn-more/application clicks, and click-through rate.
@@ -50,13 +50,13 @@ Grant creation/editing/archiving/restoration and CLI access changes are recorded
 
 ### Opportunity editor
 
-Use **Save as draft** to save an unfinished opportunity (only the title is required). Drafts are private; filter the opportunity list by **Drafts**, choose **Edit & publish**, complete the required fields, then select **Publish opportunity**. Published opportunities use **Save changes** and can be moved back to drafts with confirmation. Delete, Restore, and Move to draft use styled, keyboard-accessible dialogs with Cancel focused initially and duplicate submissions blocked. The public open/closed status remains separate from draft visibility.
+Use **Save as draft** to save an unfinished opportunity (only the title is required). Drafts are private; their green **View** link opens an admin-only preview. Filter the opportunity list by **Drafts**, choose **Edit & publish**, complete the required fields, then select **Publish opportunity**. Published opportunities use **Save changes** and can be moved back to drafts with confirmation. Delete, Restore, and Move to draft use styled, keyboard-accessible dialogs with Cancel focused initially and duplicate submissions blocked. The public open/closed status remains separate from draft visibility.
 
 Summary and additional details use Tiptap with bold, italic, underline, section headings, bulleted/numbered lists, quotes, and undo/redo. Symfony HtmlSanitizer restricts stored and rendered HTML to supported formatting and safe links. Existing plain-text records remain readable. Limits are 2,000 visible characters for summary and 20,000 for additional details.
 
-Images can use a public HTTPS URL or an uploaded JPG, PNG, or WebP (5 MB maximum, 6,000 pixels per side). Alt text is required when publishing with an image. Uploaded public marketing images use Laravel's `public` disk by default; run `storage:link` and configure `APP_URL` correctly. `OPPORTUNITY_IMAGES_DISK` can select another configured, publicly readable disk such as S3. Storage paths and disk names are server-owned. Replaced uploads are removed only after a successful save; soft-deleted opportunities keep their image for restoration. No private organisation documents are made public.
+Images supplied by a public HTTPS URL are downloaded and stored on save/import. Redirects are checked against public addresses, and failed downloads produce a field error without replacing the existing image. You can also upload a JPG, PNG, or WebP (5 MB maximum, 6,000 pixels per side). Alt text is required when publishing with an image. Uploaded public marketing images use Laravel's `public` disk by default; run `storage:link` and configure `APP_URL` correctly. `OPPORTUNITY_IMAGES_DISK` can select another configured, publicly readable disk such as S3. Storage paths and disk names are server-owned. Replaced uploads are removed only after a successful save; soft-deleted opportunities keep their image for restoration. No private organisation documents are made public.
 
-**Bulk upload CSV** opens `/admin/opportunities/import` with a downloadable template. CSV UTF-8 imports accept up to 250 rows / 2 MB; only `title` is required. Every row is forced to draft, regardless of any `status` column. Any validation error rolls back the entire batch, including audit records, and identifies the CSV record to fix. Imports create new records rather than updating existing grants. Images can be linked in CSV or uploaded later in the individual editor.
+**Bulk upload CSV** opens `/admin/opportunities/import` with a downloadable template. CSV UTF-8 imports accept up to 250 rows / 2 MB; only `title` is required. Every row is forced to draft, regardless of any `status` column. Any validation error rolls back the entire batch, including audit records, and identifies the CSV record to fix. Imports create new records rather than updating existing grants. CSV image URLs are downloaded into image storage; a failed batch also removes newly downloaded files. Images can also be uploaded later in the individual editor.
 
 The shared public/admin layout has a 1,400px maximum with responsive gutters; filters wrap into roomy rows below wide desktop sizes. Country/sector options come only from published open or closed opportunities, excluding future openings, drafts, archives, and deleted records.
 
@@ -68,7 +68,7 @@ Grant details use **Learn more** as the primary link, prioritizing `learn_more_u
 
 ## Analytics
 
-Analytics are persisted server-side, never in browser localStorage. A first-party, HTTP-only pseudonymous visitor cookie distinguishes returning browsers; a hashed session identifier deduplicates sessions. No IP address or user agent is stored in analytics.
+Analytics are opt-in through `/cookies`; no optional visits or clicks are recorded before an accepted preference. DNT/GPC still override acceptance. Analytics are persisted server-side, never in browser localStorage. A first-party, HTTP-only pseudonymous visitor cookie distinguishes returning browsers; a hashed session identifier deduplicates sessions. No IP address or user agent is stored in analytics.
 
 Each opportunity/action is counted once per session/day. Click-through rate is the percentage of recorded views with at least one outbound action. Staff traffic, recognized bots, Do Not Track, and Global Privacy Control requests are excluded. Counts are approximate; cookie clearing and different browsers affect uniqueness. Outbound targets are read from the database and restricted to HTTP(S); request parameters cannot supply an arbitrary redirect URL.
 
@@ -92,8 +92,8 @@ It excludes `.env`, dependencies, generated builds, and storage. Existing secret
 
 ```bash
 composer test
-npm run test:frontend
-npm run build
+pnpm run test:frontend
+pnpm run build
 php artisan view:cache
 ```
 
@@ -108,4 +108,11 @@ Tests cover staff authorization (including revoked access), CRUD/auditing, recov
 - Verify the demo grants, destination URLs, dates, imagery rights, and privacy notice.
 - Run the production build; ensure a stale `public/hot` file does not point production visitors to a development server.
 - Configure log/error monitoring and a retention policy appropriate for your deployment.
-# Grantnivo
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for production requirements, the clean release ZIP, environment setup, safe migration steps and launch checks.
+
+## Policies and consent
+
+Privacy, Terms & Waitlist Conditions, and Cookie Policy & Preferences are linked in the public footer. Policy links also appear beside the required waitlist checkbox. Invalid form buttons fade and stay disabled until frontend validation passes; backend validation remains authoritative.
+
+The `LEGAL_*` and `PRIVACY_CONTACT_EMAIL` defaults and environment examples contain the confirmed WAMEER operator details, Ghana registration, postal address and support email. Legal review remains a separate launch requirement; confirming contact details does not set the review flag. See [POLICY_REVIEW.md](POLICY_REVIEW.md) for the launch checklist and consent version history. Cookie choices never determine eligibility for the waitlist.

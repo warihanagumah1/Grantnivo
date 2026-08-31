@@ -13,7 +13,7 @@ class RecordEngagement
 {
     public function record(Request $request, Response $response, ?GrantOpportunity $opportunity = null, ?string $kind = null): void
     {
-        if ($request->user()?->is_admin || $request->header('DNT') === '1' || $request->header('Sec-GPC') === '1'
+        if ($request->cookie('grantnivo_analytics') !== 'accepted' || $request->user()?->is_admin || $request->header('DNT') === '1' || $request->header('Sec-GPC') === '1'
             || preg_match('/bot|crawler|spider|headless|preview/i', $request->userAgent() ?? '')
             || ! $request->hasSession()) {
             return;

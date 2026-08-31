@@ -124,3 +124,23 @@ test('each touched field keeps its own error and accessible description until co
     assert.deepEqual(controller.messages, {});
     assert.equal(organisation.getAttribute('aria-invalid'), 'true');
 });
+
+test('required policy checkbox blocks submission until checked and blocks again when unchecked', () => {
+    const checkbox = field({ type: 'checkbox', required: true, checked: false, value: 'on', name: 'acceptPolicies',
+        validity: { valid: false }, matches: () => true,
+        setCustomValidity(message) { this.validationMessage = message; this.validity.valid = !message; },
+    });
+    const controller = validatedForm();
+    controller.$el = { elements: [checkbox], querySelectorAll: () => [], reportValidity: () => {} };
+    controller.refreshValidity();
+    assert.equal(controller.blocked, true);
+    let prevented = false;
+    controller.handleSubmit({ preventDefault: () => prevented = true, stopImmediatePropagation: () => {} });
+    assert.equal(prevented, true);
+    checkbox.checked = true;
+    controller.refreshValidity();
+    assert.equal(controller.blocked, false);
+    checkbox.checked = false;
+    controller.refreshValidity();
+    assert.equal(controller.blocked, true);
+});

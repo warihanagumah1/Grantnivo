@@ -2,14 +2,15 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "grantnivo/grantnivo",
     "type": "project",
-    "description": "Grantnivo multi-tenant funding intelligence platform.",
+    "description": "Grantnivo opportunity discovery, waitlist and staff administration.",
     "keywords": [
         "laravel",
         "framework"
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.3",
+        "php": "^8.4.1",
+        "ext-curl": "*",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",

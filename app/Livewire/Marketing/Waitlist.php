@@ -22,6 +22,8 @@ class Waitlist extends Component
 
     public bool $submitted = false;
 
+    public bool $acceptPolicies = false;
+
     public function join(JoinWaitlist $join): void
     {
         if ($this->website !== '') {
@@ -29,7 +31,7 @@ class Waitlist extends Component
 
             return;
         }
-        $join->handle(['name' => $this->name, 'email' => $this->email, 'organisation' => $this->organisation], request()->ip() ?? 'unknown');
+        $join->handle(['name' => $this->name, 'email' => $this->email, 'organisation' => $this->organisation, 'acceptPolicies' => $this->acceptPolicies], request()->ip() ?? 'unknown');
         $this->reset('name', 'organisation');
         $this->submitted = true;
     }

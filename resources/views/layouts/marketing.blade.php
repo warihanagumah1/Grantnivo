@@ -37,7 +37,7 @@
 
         <div class="flex flex-1 flex-col">{{ $slot }}</div>
 
-        <footer class="border-t border-hair bg-white py-16">
+        <footer class="border-t border-hair bg-white pt-16 pb-6">
             <div class="mx-auto w-full max-w-site px-6 md:px-8">
                 <div class="grid gap-10 lg:grid-cols-[1.3fr_2fr]">
                     <div>
@@ -50,7 +50,12 @@
                         <div><p class="text-[12px] font-semibold uppercase tracking-wide text-charcoal/45">{{ __('Get Started') }}</p><ul class="mt-3 space-y-2.5"><li><a class="text-[14px] text-charcoal/70 hover:text-purple" href="{{ route('waitlist') }}">{{ __('Join the Waitlist') }}</a></li><li><a class="text-[14px] text-charcoal/70 hover:text-purple" href="{{ route('opportunities.index') }}">{{ __('Opportunities') }}</a></li></ul></div>
                     </div>
                 </div>
-                <div class="mt-12 border-t border-hair pt-6 text-center text-[13px] text-charcoal/50">{{ __('Grantnivo — A WAMEER Product') }}</div>
+                <nav aria-label="Policies" class="mt-10 flex flex-wrap justify-center gap-x-6 gap-y-3 border-t border-hair pt-6 text-[14px] font-semibold text-charcoal/75">
+                    <a href="{{ route('policies.privacy') }}" class="hover:text-purple hover:underline">Privacy Policy</a>
+                    <a href="{{ route('policies.terms') }}" class="hover:text-purple hover:underline">Terms &amp; Waitlist</a>
+                    <a href="{{ route('policies.cookies') }}" class="hover:text-purple hover:underline">Cookie Policy &amp; Preferences</a>
+                </nav>
+                <div class="mt-4 text-center text-[13px] text-charcoal/50">Grantnivo — A <a href="https://wameergroup.com/" class="hover:text-purple hover:underline focus-visible:outline-2 focus-visible:outline-purple">WAMEER</a> Product</div>
             </div>
         </footer>
         </div>

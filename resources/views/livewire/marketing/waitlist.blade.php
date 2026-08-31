@@ -20,8 +20,18 @@
                         <div class="grid gap-1.5"><label for="waitlist-name" class="text-[13px] font-medium text-white/80">{{ __('Name') }}</label><input id="waitlist-name" wire:model="name" maxlength="120" autocomplete="name" required placeholder="Amara Okafor" class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-[14px] text-white placeholder:text-white/50 outline-none transition focus:border-white/70 focus:ring-2 focus:ring-white/20 focus:bg-white/15" /><x-ui.field-error field="name" /></div>
                         <div class="grid gap-1.5"><label for="waitlist-email" class="text-[13px] font-medium text-white/80">{{ __('Work email') }}</label><input id="waitlist-email" wire:model="email" maxlength="255" autocomplete="email" required type="email" placeholder="amara@organisation.org" class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-[14px] text-white placeholder:text-white/50 outline-none transition focus:border-white/70 focus:ring-2 focus:ring-white/20 focus:bg-white/15" /><x-ui.field-error field="email" /></div>
                         <div class="grid gap-1.5"><label for="waitlist-organisation" class="text-[13px] font-medium text-white/80">{{ __('Organisation') }}</label><input id="waitlist-organisation" wire:model="organisation" maxlength="180" autocomplete="organization" required placeholder="Your organisation" class="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-[14px] text-white placeholder:text-white/50 outline-none transition focus:border-white/70 focus:ring-2 focus:ring-white/20 focus:bg-white/15" /><x-ui.field-error field="organisation" /></div>
+                        <div class="mt-2 grid gap-2">
+                            <div class="flex items-start gap-3">
+                                <input id="waitlist-policies" type="checkbox" wire:model="acceptPolicies" required aria-labelledby="waitlist-policies-label" class="mt-1 size-5 shrink-0 cursor-pointer rounded border-white/50 accent-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white" />
+                                <label id="waitlist-policies-label" for="waitlist-policies" class="text-[13px] leading-relaxed text-white/85">
+                                    I agree to the <a href="{{ route('policies.terms') }}" target="_blank" rel="noopener" class="font-semibold text-white underline underline-offset-2">Terms &amp; Waitlist Conditions</a> and acknowledge the <a href="{{ route('policies.privacy') }}" target="_blank" rel="noopener" class="font-semibold text-white underline underline-offset-2">Privacy Policy</a>. I request waitlist updates and early-access invitations by email. I can withdraw this request at any time.
+                                    <span class="sr-only">Policy links open in a new tab.</span>
+                                </label>
+                            </div>
+                            <x-ui.field-error field="acceptPolicies" />
+                        </div>
                         <button type="submit" class="mt-2 inline-flex items-center justify-center gap-3 rounded-full bg-red px-6 py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#b31f15]" disabled x-bind:disabled="blocked" x-bind:aria-disabled="blocked.toString()">{{ __('Join the Waitlist') }} <flux:icon.arrow-right class="size-5 shrink-0" aria-hidden="true" /></button>
-                        <p class="mt-1 text-center text-[12px] text-white/55">{{ __('No spam. Early access invitations only.') }}</p>
+                        <p class="mt-1 text-center text-[12px] text-white/55">{{ __('Waitlist emails only. Optional analytics is a separate choice.') }}</p>
                     </x-ui.validated-form>
                 @endif
             </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CookiePreferencesController;
 use App\Http\Controllers\LegacyOpportunityRedirectController;
 use App\Http\Controllers\MarketingAboutController;
 use App\Http\Controllers\MarketingHomeController;
@@ -24,6 +25,11 @@ Route::get('opportunities/{grantOpportunity:uuid}/visit/{kind}', OpportunityLink
     ->whereIn('kind', ['apply', 'funder', 'learn_more'])->middleware('throttle:60,1')->name('opportunities.visit');
 Route::get('opportunities/{legacyOpportunity:slug}/visit/{kind}', [LegacyOpportunityRedirectController::class, 'visit'])
     ->whereIn('kind', ['apply', 'funder', 'learn_more'])->middleware('throttle:60,1')->name('opportunities.legacy-visit');
+
+Route::view('privacy', 'pages.policies.privacy')->name('policies.privacy');
+Route::view('terms', 'pages.policies.terms')->name('policies.terms');
+Route::view('cookies', 'pages.policies.cookies')->name('policies.cookies');
+Route::post('cookies/preferences', CookiePreferencesController::class)->middleware('throttle:30,1')->name('policies.cookies.save');
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
     Route::get('/', Admin\Overview::class)->name('overview');

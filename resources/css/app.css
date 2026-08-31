@@ -175,7 +175,7 @@
 [data-flux-button]:disabled,
 [data-flux-button][aria-disabled='true'] {
     cursor: not-allowed;
-    opacity: 1;
+    opacity: 0.55;
     transform: none;
 }
 
@@ -219,7 +219,7 @@ select:focus[data-flux-control] {
 
 [data-validated-form] button[type='submit']:disabled {
     cursor: not-allowed;
-    opacity: 1;
+    opacity: 0.55;
 }
 
 .form-validation-feedback {
@@ -236,3 +236,18 @@ select:focus[data-flux-control] {
 .validation-on-purple input[aria-invalid='true'] {
     border-color: #fda4af;
 }
+
+.admin-primary:disabled,
+.admin-secondary:disabled,
+[data-validated-form] button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.policy-copy { @apply space-y-5 text-[16px] leading-relaxed text-charcoal/80; }
+.policy-copy h2 { @apply scroll-mt-28 pt-6 text-[23px] font-bold text-charcoal; }
+.policy-copy h3 { @apply pt-3 text-[18px] font-semibold text-charcoal; }
+.policy-copy ul { @apply list-disc space-y-2 pl-6; }
+.policy-copy a { @apply font-semibold text-purple underline underline-offset-2; }
+.policy-copy table { @apply w-full text-left text-[14px]; }
+.policy-copy th, .policy-copy td { @apply border-b border-hair px-3 py-3 align-top; }
