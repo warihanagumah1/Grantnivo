@@ -50,14 +50,19 @@ class OpportunityPresentationTest extends TestCase
     public function test_cards_and_details_present_every_sector(): void
     {
         $grant = $this->grant('multi-sector-grant', [
-            'thematic_sectors' => ['Health', 'Climate Change', 'Gender Equality'],
+            'thematic_sectors' => ['Health', 'Climate Change', 'Gender Equality', 'Poverty Reduction'],
         ]);
 
-        $this->get(route('opportunities.index'))->assertOk()
-            ->assertSeeInOrder(['Health', 'Climate Change', 'Gender Equality']);
+        $card = view('components.marketing.opportunity-card', ['opportunity' => $grant])->render();
+        $this->assertStringContainsString('Health', $card);
+        $this->assertStringContainsString('Climate Change', $card);
+        $this->assertStringContainsString('Gender Equality', $card);
+        $this->assertStringContainsString('+1 more', $card);
+        $this->assertStringNotContainsString('Poverty Reduction', $card);
+
         $this->get(route('opportunities.show', $grant))->assertOk()
-            ->assertSeeInOrder(['Health', 'Climate Change', 'Gender Equality'])
-            ->assertSee('Health, Climate Change, Gender Equality');
+            ->assertSeeInOrder(['Health', 'Climate Change', 'Gender Equality', 'Poverty Reduction'])
+            ->assertSee('Health, Climate Change, Gender Equality, Poverty Reduction');
     }
 
     public function test_learn_more_is_primary_and_duplicate_empty_or_unsafe_links_are_hidden(): void
