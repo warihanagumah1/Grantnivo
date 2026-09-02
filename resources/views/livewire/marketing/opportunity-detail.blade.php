@@ -16,7 +16,7 @@
                 @empty
                     <span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ __('General') }}</span>
                 @endforelse
-                <span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->funding_type ?: __('Grant') }}</span><span class="rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-white backdrop-blur">{{ $grantOpportunity->isOpen() ? __('Open for applications') : $grantOpportunity->publicStatusLabel() }}</span>
+                <span class="rounded-full bg-purple px-3 py-1 text-[12px] font-semibold text-white shadow-sm shadow-black/10">{{ $grantOpportunity->funding_type ?: __('Grant') }}</span><span class="rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-white backdrop-blur">{{ $grantOpportunity->isOpen() ? __('Open for applications') : $grantOpportunity->publicStatusLabel() }}</span>
             </div>
             <h1 class="mt-4 max-w-3xl text-[32px] font-extrabold leading-tight tracking-[-0.02em] text-white md:text-[44px]">{{ $grantOpportunity->title }}</h1>
             <p class="mt-2 font-mono text-[13px] uppercase tracking-wide text-white/70">{{ $grantOpportunity->funder }}</p>

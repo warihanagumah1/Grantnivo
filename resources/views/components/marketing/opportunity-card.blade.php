@@ -20,7 +20,7 @@
             @if(count($opportunity->thematic_sectors ?? []) > 3)
                 <span class="inline-flex w-fit rounded-full bg-purple-tint px-2.5 py-0.5 text-[11px] font-semibold text-purple">+{{ count($opportunity->thematic_sectors) - 3 }} {{ __('more') }}</span>
             @endif
-            <span class="inline-flex w-fit rounded-full border border-hair px-2.5 py-0.5 text-[11px] font-medium text-charcoal/60">{{ $opportunity->funding_type ?: __('Grant') }}</span>
+            <span class="inline-flex w-fit rounded-full bg-purple px-2.5 py-0.5 text-[11px] font-semibold text-white shadow-sm shadow-purple/20">{{ $opportunity->funding_type ?: __('Grant') }}</span>
         </div>
         <dl class="mt-4 space-y-2 border-t border-hair pt-4 text-[13px]">
             <div class="flex items-center gap-2 text-charcoal/70"><flux:icon.map-pin class="size-4 text-charcoal/40" /><span>{{ implode(', ', $opportunity->eligible_countries ?? []) }}</span></div>
