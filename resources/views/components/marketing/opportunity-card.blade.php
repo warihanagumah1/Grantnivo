@@ -12,7 +12,11 @@
         <span class="font-mono text-[11px] uppercase tracking-wide text-charcoal/45">{{ $opportunity->funder }}</span>
         <h3 class="mt-1.5 text-[18px] font-semibold text-charcoal">{{ $opportunity->title }}</h3>
         <div class="mt-2 flex flex-wrap items-center gap-1.5">
-            <span class="inline-flex w-fit rounded-full bg-purple-tint px-2.5 py-0.5 text-[11px] font-medium text-purple">{{ $opportunity->thematic_sectors[0] ?? __('General') }}</span>
+            @forelse($opportunity->thematic_sectors ?? [] as $sector)
+                <span class="inline-flex w-fit rounded-full bg-purple-tint px-2.5 py-0.5 text-[11px] font-medium text-purple">{{ $sector }}</span>
+            @empty
+                <span class="inline-flex w-fit rounded-full bg-purple-tint px-2.5 py-0.5 text-[11px] font-medium text-purple">{{ __('General') }}</span>
+            @endforelse
             <span class="inline-flex w-fit rounded-full border border-hair px-2.5 py-0.5 text-[11px] font-medium text-charcoal/60">{{ $opportunity->funding_type ?: __('Grant') }}</span>
         </div>
         <dl class="mt-4 space-y-2 border-t border-hair pt-4 text-[13px]">

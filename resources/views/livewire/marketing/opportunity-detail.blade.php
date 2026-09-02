@@ -10,7 +10,14 @@
         <div class="absolute inset-0 bg-gradient-to-t from-charcoal/95 via-charcoal/55 to-charcoal/25"></div>
         <div class="relative mx-auto flex min-h-[340px] w-full max-w-site flex-col justify-end px-6 py-10 md:min-h-[420px] md:px-8">
             <a href="{{ route(($preview ?? false) ? 'admin.opportunities' : 'opportunities.index') }}" class="mb-4 flex w-fit items-center gap-1.5 text-[13px] font-medium text-white/80 hover:text-white"><flux:icon.arrow-left class="size-4" />{{ __('All opportunities') }}</a>
-            <div class="flex flex-wrap items-center gap-2"><span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->thematic_sectors[0] ?? __('General') }}</span><span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->funding_type ?: __('Grant') }}</span><span class="rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-white backdrop-blur">{{ $grantOpportunity->isOpen() ? __('Open for applications') : $grantOpportunity->publicStatusLabel() }}</span></div>
+            <div class="flex flex-wrap items-center gap-2">
+                @forelse($grantOpportunity->thematic_sectors ?? [] as $sector)
+                    <span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $sector }}</span>
+                @empty
+                    <span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ __('General') }}</span>
+                @endforelse
+                <span class="rounded-full bg-white/15 px-3 py-1 text-[12px] font-medium text-white backdrop-blur">{{ $grantOpportunity->funding_type ?: __('Grant') }}</span><span class="rounded-full bg-teal px-3 py-1 text-[12px] font-semibold text-white backdrop-blur">{{ $grantOpportunity->isOpen() ? __('Open for applications') : $grantOpportunity->publicStatusLabel() }}</span>
+            </div>
             <h1 class="mt-4 max-w-3xl text-[32px] font-extrabold leading-tight tracking-[-0.02em] text-white md:text-[44px]">{{ $grantOpportunity->title }}</h1>
             <p class="mt-2 font-mono text-[13px] uppercase tracking-wide text-white/70">{{ $grantOpportunity->funder }}</p>
         </div>
@@ -24,7 +31,7 @@
                 @if($grantOpportunity->description)<div class="grant-rich-text mt-6 text-[16px] text-charcoal/75">{!! app(\App\Services\Grants\RichText::class)->sanitize($grantOpportunity->description) !!}</div>@endif
                 <h3 class="mt-10 text-[16px] font-bold text-charcoal">{{ __('At a glance') }}</h3>
                 <div class="mt-4 grid gap-3 sm:grid-cols-2">
-                    @foreach ([__('Focus area') => ($grantOpportunity->thematic_sectors[0] ?? __('General')), __('Funder') => $grantOpportunity->funder, __('Eligible countries') => implode(', ', $grantOpportunity->eligible_countries ?? []), __('Funding amount') => $grantOpportunity->displayAmount()] as $label => $value)
+                    @foreach ([__('Focus areas') => (implode(', ', $grantOpportunity->thematic_sectors ?? []) ?: __('General')), __('Funder') => $grantOpportunity->funder, __('Eligible countries') => implode(', ', $grantOpportunity->eligible_countries ?? []), __('Funding amount') => $grantOpportunity->displayAmount()] as $label => $value)
                         <div class="rounded-lg border border-hair px-4 py-3"><p class="font-mono text-[11px] uppercase tracking-wide text-charcoal/45">{{ $label }}</p><p class="mt-0.5 text-[14px] font-medium text-charcoal">{{ $value }}</p></div>
                     @endforeach
                 </div>

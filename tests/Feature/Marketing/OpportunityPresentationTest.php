@@ -47,6 +47,19 @@ class OpportunityPresentationTest extends TestCase
             ->call('selectAllSectors')->assertSee('visible-grant')->call('clearSectors')->assertDontSee('visible-grant');
     }
 
+    public function test_cards_and_details_present_every_sector(): void
+    {
+        $grant = $this->grant('multi-sector-grant', [
+            'thematic_sectors' => ['Health', 'Climate Change', 'Gender Equality'],
+        ]);
+
+        $this->get(route('opportunities.index'))->assertOk()
+            ->assertSeeInOrder(['Health', 'Climate Change', 'Gender Equality']);
+        $this->get(route('opportunities.show', $grant))->assertOk()
+            ->assertSeeInOrder(['Health', 'Climate Change', 'Gender Equality'])
+            ->assertSee('Health, Climate Change, Gender Equality');
+    }
+
     public function test_learn_more_is_primary_and_duplicate_empty_or_unsafe_links_are_hidden(): void
     {
         $grant = $this->grant('linked-grant', ['learn_more_url' => 'https://example.org/info', 'opportunity_url' => 'https://example.org/apply', 'funder_url' => 'https://example.org']);
