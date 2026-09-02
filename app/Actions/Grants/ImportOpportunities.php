@@ -51,7 +51,7 @@ class ImportOpportunities
                     throw ValidationException::withMessages(['file' => 'Import up to 250 rows at a time. Split this CSV into smaller files.']);
                 }
                 if (count($values) !== count($header)) {
-                    $errors['rows.'.$record] = 'Row '.$record.': the number of cells does not match the header. Put comma-separated countries inside quotes.';
+                    $errors['rows.'.$record] = 'Row '.$record.': the number of cells does not match the header. Put comma-separated countries or sectors inside quotes.';
 
                     continue;
                 }

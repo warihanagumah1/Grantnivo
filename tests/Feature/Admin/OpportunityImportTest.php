@@ -37,7 +37,7 @@ class OpportunityImportTest extends TestCase
 
     public function test_bulk_import_always_creates_drafts_and_accepts_bom_quoted_lists_and_multiline_text(): void
     {
-        $csv = "\xEF\xBB\xBFtitle,countries,summary,status\nFirst grant,\"Ghana, Kenya\",\"First paragraph\nSecond paragraph\",active\nSecond grant,Kenya,<p><strong>Formatted</strong></p>,closed\n";
+        $csv = "\xEF\xBB\xBFtitle,sector,countries,summary,status\nFirst grant,\"Education, Health\",\"Ghana, Kenya\",\"First paragraph\nSecond paragraph\",active\nSecond grant,Climate,Kenya,<p><strong>Formatted</strong></p>,closed\n";
         Livewire::actingAs(User::factory()->admin()->create())->test(OpportunityImport::class)
             ->set('file', UploadedFile::fake()->createWithContent('grants.csv', $csv))
             ->call('import')->assertHasNoErrors()->assertRedirect(route('admin.opportunities', ['status' => 'draft']));
@@ -47,6 +47,7 @@ class OpportunityImportTest extends TestCase
             $this->assertSame(OpportunityStatus::Draft, $grant->status);
             $this->get(route('opportunities.show', $grant))->assertNotFound();
         }
+        $this->assertSame(['Education', 'Health'], GrantOpportunity::first()->thematic_sectors);
         $this->assertSame(['Ghana', 'Kenya'], GrantOpportunity::first()->eligible_countries);
         $this->assertStringContainsString('<br', GrantOpportunity::first()->summary);
         $this->assertStringContainsString('<strong>Formatted</strong>', GrantOpportunity::latest('id')->first()->summary);

@@ -11,9 +11,11 @@ export function fieldMessage(field, fields) {
     }
     if (value && field.dataset.listMax) {
         const items = [...new Set(value.split(',').map((item) => item.trim()).filter(Boolean))];
-        if (!items.length) return 'Enter at least one country.';
-        if (items.length > Number(field.dataset.listMax)) return `Use no more than ${field.dataset.listMax} countries.`;
-        if (items.some((item) => [...item].length > Number(field.dataset.itemMax))) return `Each country must be no longer than ${field.dataset.itemMax} characters.`;
+        const listName = field.dataset.listName || 'items';
+        const itemName = field.dataset.listItemName || 'item';
+        if (!items.length) return `Enter at least one ${itemName}.`;
+        if (items.length > Number(field.dataset.listMax)) return `Use no more than ${field.dataset.listMax} ${listName}.`;
+        if (items.some((item) => [...item].length > Number(field.dataset.itemMax))) return `Each ${itemName} must be no longer than ${field.dataset.itemMax} characters.`;
     }
     if (value && field.dataset.protocols && !field.dataset.protocols.split(',').some((protocol) => value.toLowerCase().startsWith(`${protocol}//`))) {
         return 'Use an HTTPS URL.';

@@ -14,13 +14,13 @@
         <div class="grid gap-4">
             @if($errors->any())<div role="alert" class="rounded-xl border border-red/20 bg-red/5 p-4 text-[13px] text-red">Please correct the highlighted fields before saving.</div>@endif
             <x-admin.input label="Grant title" field="title" placeholder="Resilient Communities Fund" maxlength="255" required />
-            <div class="grid gap-4 sm:grid-cols-2"><x-admin.input label="Funder" field="funder" placeholder="Wellspring Foundation" maxlength="255" required /><x-admin.input label="Sector" field="sector" placeholder="Climate & Livelihoods" maxlength="255" required /></div>
+            <div class="grid gap-4 sm:grid-cols-2"><x-admin.input label="Funder" field="funder" placeholder="Wellspring Foundation" maxlength="255" required /><x-admin.input label="Sectors" field="sector" data-list-max="100" data-item-max="120" data-list-name="sectors" data-list-item-name="sector" placeholder="Health, Climate Change, Research" maxlength="2000" required /></div>
             <div class="grid gap-4 sm:grid-cols-2">
                 <div class="grid gap-1.5"><label for="funding_type" class="text-[13px] font-medium text-charcoal/75">Type</label><select id="funding_type" wire:model="form.funding_type" class="admin-input"><option>Grant</option><option>Partnership</option></select><x-ui.field-error field="form.funding_type" /></div>
                 <div class="grid gap-1.5"><label for="status" class="text-[13px] font-medium text-charcoal/75">Status when published</label><select id="status" wire:model="form.status" class="admin-input"><option value="active">Open</option><option value="closed">Closed</option><option value="closing_soon">Closing soon</option></select><x-ui.field-error field="form.status" /></div>
             </div>
             <div class="grid gap-4 sm:grid-cols-2"><div class="grid grid-cols-[1fr_90px] gap-2"><x-admin.input label="Funding amount" field="maximum_award" type="number" placeholder="250000" min="0" max="999999999999" step="1" /><div class="grid content-start gap-1.5"><label for="currency" class="text-[13px] font-medium text-charcoal/75">Currency</label><select id="currency" wire:model="form.currency" class="admin-input px-2!"><option>USD</option><option>EUR</option><option>GBP</option><option>GHS</option></select><x-ui.field-error field="form.currency" /></div></div><x-admin.input label="Deadline (blank for rolling)" field="deadline" type="date" /></div>
-            <x-admin.input label="Eligible countries" field="countries" data-list-max="100" data-item-max="120" placeholder="Kenya, Uganda, Tanzania" maxlength="2000" required />
+            <x-admin.input label="Eligible countries" field="countries" data-list-max="100" data-item-max="120" data-list-name="countries" data-list-item-name="country" placeholder="Kenya, Uganda, Tanzania" maxlength="2000" required />
             <fieldset class="grid gap-3 rounded-xl border-2 border-slate-300 bg-white p-4">
                 <legend class="px-1 text-[13px] font-semibold text-charcoal">Opportunity image</legend>
                 <div class="flex flex-wrap gap-5 text-[14px]">

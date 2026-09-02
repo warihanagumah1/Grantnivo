@@ -29,7 +29,7 @@ class V1AdminTest extends TestCase
     /** @return array<string, mixed> */
     private function fields(): array
     {
-        return ['title' => 'Community Fund', 'funder' => 'Example Foundation', 'sector' => 'Education',
+        return ['title' => 'Community Fund', 'funder' => 'Example Foundation', 'sector' => 'Education, Health, Education',
             'countries' => 'Ghana, Kenya, Ghana', 'funding_type' => 'Grant', 'status' => 'active',
             'maximum_award' => 250000, 'currency' => 'USD', 'deadline' => today()->addMonth()->format('Y-m-d'),
             'summary' => 'Support for community programmes.', 'description' => 'Read the eligibility requirements.',
@@ -61,6 +61,7 @@ class V1AdminTest extends TestCase
         Livewire::actingAs($staff)->test(OpportunityForm::class)->set('form', $this->fields())
             ->call('save')->assertHasNoErrors()->assertRedirect(route('admin.opportunities'));
         $opportunity = GrantOpportunity::query()->sole();
+        $this->assertSame(['Education', 'Health'], $opportunity->thematic_sectors);
         $this->assertSame(['Ghana', 'Kenya'], $opportunity->eligible_countries);
         $this->assertDatabaseHas('admin_audit_logs', ['action' => 'opportunity.created', 'user_id' => $staff->id]);
         $this->get(route('opportunities.show', $opportunity))->assertOk()->assertSee('Community Fund');

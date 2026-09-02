@@ -78,14 +78,15 @@ test('dependent image description becomes optional again when the URL is cleared
     assert.equal(message(alt, [image]), '');
 });
 
-test('admin image URLs require HTTPS and country lists enforce server limits', () => {
+test('admin image URLs require HTTPS and comma-separated lists enforce server limits', () => {
     assert.ok(message({ value: 'http://example.org/image.jpg', dataset: { protocols: 'https:' } }));
     assert.equal(message({ value: 'https://example.org/image.jpg', dataset: { protocols: 'https:' } }), '');
-    const dataset = { listMax: '100', itemMax: '120' };
+    const dataset = { listMax: '100', itemMax: '120', listName: 'countries', listItemName: 'country' };
     assert.ok(message({ value: ', ,', dataset }));
     assert.ok(message({ value: 'a'.repeat(121), dataset }));
     assert.ok(message({ value: Array.from({length:101}, (_,i)=>`Country ${i}`).join(','), dataset }));
     assert.equal(message({ value: 'Ghana, Kenya, Ghana', dataset }), '');
+    assert.match(message({ value: 'a'.repeat(121), dataset: { ...dataset, listName: 'sectors', listItemName: 'sector' } }), /sector/);
 });
 
 test('each touched field keeps its own error and accessible description until corrected', () => {

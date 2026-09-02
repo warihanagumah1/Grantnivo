@@ -42,7 +42,7 @@ class SaveOpportunity
         $data = Validator::make($input, [
             'title' => ['required', 'string', 'max:255'],
             'funder' => [$required, 'string', 'max:255'],
-            'sector' => [$required, 'string', 'max:255'],
+            'sector' => [$required, 'string', 'max:2000'],
             'countries' => [$required, 'string', 'max:2000'],
             'funding_type' => ['required', Rule::in(['Grant', 'Partnership'])],
             'status' => ['required', Rule::in([OpportunityStatus::Draft->value, OpportunityStatus::Active->value, OpportunityStatus::Closed->value, OpportunityStatus::ClosingSoon->value])],
@@ -66,7 +66,9 @@ class SaveOpportunity
             ])->validate();
         }
         $data['funder'] ??= '';
-        $data['thematic_sectors'] = empty($data['sector']) ? [] : [trim($data['sector'])];
+        $sectors = array_values(array_unique(array_filter(array_map('trim', explode(',', $data['sector'] ?? '')))));
+        Validator::make(['sector' => $sectors], ['sector' => ['array', 'min:'.($draft ? 0 : 1), 'max:100'], 'sector.*' => ['string', 'max:120']])->validate();
+        $data['thematic_sectors'] = $sectors;
         $data['eligible_countries'] = array_values(array_unique(array_filter(array_map('trim', explode(',', $data['countries'] ?? '')))));
         Validator::make(['countries' => $data['eligible_countries']], ['countries' => ['array', 'min:'.($draft ? 0 : 1), 'max:100'], 'countries.*' => ['string', 'max:120']])->validate();
         unset($data['sector'], $data['countries'], $data['image_source'], $data['image']);

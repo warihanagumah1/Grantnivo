@@ -85,6 +85,7 @@ class OpportunityForm extends AdminPage
                 $key = match (true) {
                     $field === 'image' => 'image',
                     $field === 'image_source' => 'imageSource',
+                    str_starts_with($field, 'sector.') => 'form.sector',
                     str_starts_with($field, 'countries.') => 'form.countries',
                     default => 'form.'.$field,
                 };
