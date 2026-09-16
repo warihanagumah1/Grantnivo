@@ -50,6 +50,8 @@ Grant creation/editing/archiving/restoration and CLI access changes are recorded
 
 ### Opportunity editor
 
+Opportunity types are **Grant**, **Partnership**, and **Fellowship**. Select the type in the editor or enter its exact label in the CSV `funding_type` column. All three types appear on public cards and can be filtered on the opportunities page.
+
 Use **Save as draft** to save an unfinished opportunity (only the title is required). Drafts are private; their green **View** link opens an admin-only preview. Filter the opportunity list by **Drafts**, choose **Edit & publish**, complete the required fields, then select **Publish opportunity**. Published opportunities use **Save changes** and can be moved back to drafts with confirmation. Delete, Restore, and Move to draft use styled, keyboard-accessible dialogs with Cancel focused initially and duplicate submissions blocked. The public open/closed status remains separate from draft visibility.
 
 Summary and additional details use Tiptap with bold, italic, underline, section headings, bulleted/numbered lists, quotes, and undo/redo. Symfony HtmlSanitizer restricts stored and rendered HTML to supported formatting and safe links. Existing plain-text records remain readable. Limits are 2,000 visible characters for summary and 20,000 for additional details.

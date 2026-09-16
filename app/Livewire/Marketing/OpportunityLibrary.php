@@ -98,7 +98,9 @@ class OpportunityLibrary extends Component
             ->when($this->status === 'closed', fn ($query) => $query->closed())
             ->when($this->status === 'all', fn ($query) => $query->whereNotIn('status', ['draft', 'archived']))
             ->when($this->search !== '', fn ($query) => $query->search($this->search))
-            ->when($this->type !== 'all', fn ($query) => $query->where('funding_type', $this->type === 'grant' ? 'Grant' : 'Partnership'))
+            ->when($this->type !== 'all', fn ($query) => $query->where('funding_type', match ($this->type) {
+                'grant' => 'Grant', 'partnership' => 'Partnership', 'fellowship' => 'Fellowship', default => '',
+            }))
             ->when(array_diff($this->sectors, $selectedSectors) !== [] || $this->selectedSectors !== $selectedSectors, function ($query) use ($selectedSectors): void {
                 if ($selectedSectors === []) {
                     $query->whereRaw('1 = 0');

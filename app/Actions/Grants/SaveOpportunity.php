@@ -44,7 +44,7 @@ class SaveOpportunity
             'funder' => [$required, 'string', 'max:255'],
             'sector' => [$required, 'string', 'max:2000'],
             'countries' => [$required, 'string', 'max:2000'],
-            'funding_type' => ['required', Rule::in(['Grant', 'Partnership'])],
+            'funding_type' => ['required', Rule::in(['Grant', 'Partnership', 'Fellowship'])],
             'status' => ['required', Rule::in([OpportunityStatus::Draft->value, OpportunityStatus::Active->value, OpportunityStatus::Closed->value, OpportunityStatus::ClosingSoon->value])],
             'maximum_award' => ['nullable', 'integer', 'min:0', 'max:999999999999'],
             'currency' => ['required', Rule::in(['USD', 'EUR', 'GBP', 'GHS'])],

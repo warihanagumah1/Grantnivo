@@ -10,7 +10,7 @@
         <ul class="mt-5 list-disc space-y-2 pl-5 text-[13px] text-charcoal/70">
             <li>Up to 250 opportunities per file, maximum 2 MB. Each upload creates new drafts; it does not update existing opportunities.</li>
             <li>Use YYYY-MM-DD for deadlines; leave blank for rolling deadlines. Funding amount should be a whole number without currency symbols.</li>
-            <li>Separate sectors and countries with commas inside their spreadsheet cells. Use Grant or Partnership, and USD, EUR, GBP, or GHS.</li>
+            <li>Separate sectors and countries with commas inside their spreadsheet cells. Use Grant, Partnership, or Fellowship for funding_type, and USD, EUR, GBP, or GHS for currency.</li>
             <li>Summary and details accept Markdown (recommended), supported HTML, or plain text. Use an HTTPS image URL, or upload images individually after import.</li>
             <li>Any status column is ignored: imported opportunities always start as drafts. Delete the example row before importing your own data.</li>
         </ul>
